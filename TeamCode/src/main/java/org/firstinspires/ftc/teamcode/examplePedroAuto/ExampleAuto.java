@@ -16,7 +16,7 @@ import  com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 
-// note - make sure to make the robot size 18 by 18
+// note - make sure to make the robot size 18 by 18 for the visualizer https://visualizer.pedropathing.com/
 // note 2 - pedro's coordinates are like a normal y vs x plot
 
 @Autonomous(name = "Example Auto", group = "Examples")
@@ -46,6 +46,7 @@ public class ExampleAuto extends OpMode {
     public static final int INIT_SECONDS = 1;
     public static final int LAUNCH_SECONDS = 3;
 
+    // make paths with different start and end positions and angles
     public void buildPedroPaths()
     {
         goToArtifacts = new Path(
@@ -68,28 +69,34 @@ public class ExampleAuto extends OpMode {
         park.setLinearHeadingInterpolation(Math.toRadians(135), NINETY);
     }
 
+
     public void autonomousStateMachine()
     {
         switch(pathState)
         {
+            // when starting you may want to wait a second to reposition servos and motors
             case INIT:
                 if (pathTimer.getElapsedTimeSeconds() >= INIT_SECONDS) pathState = BasicStates.TO_ARTIFACT;
                 break;
 
             case TO_ARTIFACT:
-                follower.followPath(goToArtifacts, true);
+                follower.followPath(goToArtifacts, true); // holdEnd means it will stay at the point after reaching it
+
+                // move to the next state when the path has completed
                 if (!follower.isBusy()) pathState = BasicStates.TO_SCORING;
                 break;
 
             case TO_SCORING:
                 follower.followPath(goToScoring, true);
 
+                // I want the timer to start at 0 once the robot reaches the end position
                 if (!follower.isBusy() && resetTimer)
                 {
                     pathTimer.resetTimer();
                     resetTimer = false;
                 }
 
+                // 3 seconds after the robot reached the end position, the next state should start (the 3 seconds are for the robot to shoot the artifacts (balls) )
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > LAUNCH_SECONDS)
                 {
                     pathState = BasicStates.PARK;
@@ -101,6 +108,7 @@ public class ExampleAuto extends OpMode {
                 if (!follower.isBusy()) pathState = BasicStates.IDLE;
                 break;
 
+            // final state for when the paths are finished - can use this to set up positions for TeleOp
             case IDLE:
                 break;
         }
@@ -127,8 +135,9 @@ public class ExampleAuto extends OpMode {
     @Override
     public void loop() {
         follower.update();
-        autonomousStateMachine();
+        autonomousStateMachine(); // need to constantly check the state machine status
 
+        // as the program is running, you can view the status of the robot for debugging
         telemetry.addData("path state:", pathState);
         telemetry.addData("x:", follower.getPose().getX());
         telemetry.addData("y:", follower.getPose().getY());
