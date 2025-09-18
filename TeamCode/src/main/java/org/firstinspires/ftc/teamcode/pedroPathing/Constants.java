@@ -12,6 +12,9 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class Constants {
+    public static final double NINETY = Math.toRadians(90);
+    public static final double ONEEIGHTY = Math.toRadians(180);
+
     public static FollowerConstants followerConstants = new FollowerConstants().mass(13.6);
 
     public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1, 1);
@@ -49,4 +52,5 @@ public class Constants {
                 .mecanumDrivetrain(driveConstants)
                 .build();
     }
+
 }
