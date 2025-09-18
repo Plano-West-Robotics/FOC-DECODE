@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.pedroPathing.exampleAuto;
+package org.firstinspires.ftc.teamcode.examplePedroAuto;
 
 import static org.firstinspires.ftc.teamcode.pedroPathing.Constants.NINETY;
 import static org.firstinspires.ftc.teamcode.pedroPathing.Constants.ONEEIGHTY;
