@@ -41,8 +41,6 @@ public class ExampleAuto extends OpMode {
     private PathChain goToScoring;
     private Path park;
 
-    private boolean resetTimer = true;
-
     public static final int INIT_SECONDS = 1;
     public static final int LAUNCH_SECONDS = 3;
 
@@ -69,6 +67,11 @@ public class ExampleAuto extends OpMode {
         park.setLinearHeadingInterpolation(Math.toRadians(135), NINETY);
     }
 
+    public void setPathState(BasicStates pState)
+    {
+        pathState = pState;
+        pathTimer.resetTimer();
+    }
 
     public void autonomousStateMachine()
     {
@@ -76,36 +79,30 @@ public class ExampleAuto extends OpMode {
         {
             // when starting you may want to wait a second to reposition servos and motors
             case INIT:
-                if (pathTimer.getElapsedTimeSeconds() >= INIT_SECONDS) pathState = BasicStates.TO_ARTIFACT;
+                if (pathTimer.getElapsedTimeSeconds() >= INIT_SECONDS) setPathState(BasicStates.TO_ARTIFACT);
                 break;
 
             case TO_ARTIFACT:
                 follower.followPath(goToArtifacts, true); // holdEnd means it will stay at the point after reaching it
 
                 // move to the next state when the path has completed
-                if (!follower.isBusy()) pathState = BasicStates.TO_SCORING;
+                if (!follower.isBusy()) setPathState(BasicStates.TO_SCORING);
                 break;
 
             case TO_SCORING:
                 follower.followPath(goToScoring, true);
 
-                // I want the timer to start at 0 once the robot reaches the end position
-                if (!follower.isBusy() && resetTimer)
-                {
-                    pathTimer.resetTimer();
-                    resetTimer = false;
-                }
+                if (!follower.isBusy()) setPathState(BasicStates.AT_SCORING);
+                break;
 
-                // 3 seconds after the robot reached the end position, the next state should start (the 3 seconds are for the robot to shoot the artifacts (balls) )
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > LAUNCH_SECONDS)
-                {
-                    pathState = BasicStates.PARK;
-                }
+            case AT_SCORING:
+                // 3 seconds after the robot has reached the end position, the robot should be done shooting artifacts
+                if (pathTimer.getElapsedTimeSeconds() >= LAUNCH_SECONDS) setPathState(BasicStates.PARK);
                 break;
 
             case PARK:
                 follower.followPath(park);
-                if (!follower.isBusy()) pathState = BasicStates.IDLE;
+                if (!follower.isBusy()) setPathState(BasicStates.IDLE);
                 break;
 
             // final state for when the paths are finished - can use this to set up positions for TeleOp
@@ -129,7 +126,7 @@ public class ExampleAuto extends OpMode {
     public void start()
     {
         opmodeTimer.resetTimer();
-        pathState = BasicStates.INIT;
+        setPathState(BasicStates.INIT);
     }
 
     @Override
@@ -144,13 +141,4 @@ public class ExampleAuto extends OpMode {
         telemetry.addData("heading:", follower.getPose().getHeading());
         telemetry.update();
     }
-}
-
-enum BasicStates
-{
-    INIT,
-    TO_ARTIFACT,
-    TO_SCORING,
-    PARK,
-    IDLE
 }
