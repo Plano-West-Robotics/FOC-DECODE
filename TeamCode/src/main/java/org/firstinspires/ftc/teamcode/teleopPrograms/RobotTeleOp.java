@@ -37,28 +37,6 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 public class RobotTeleOp extends OpMode
 {
     //Enums
-    //Movement Direciton Enum
-    private enum Direction
-    {
-        //DEFAULT STATE
-        DEFAULT,
-
-        //CARDINAL MOVEMENT (NOT CURRENTLY NEEDED)
-        FORWARD,
-        LEFT,
-        BACKWARD,
-        RIGHT,
-
-        //DIAGONAL MOVEMENT
-        FOR_LEFT,
-        FOR_RIGHT,
-        BACK_LEFT,
-        BACK_RIGHT,
-
-        //ROTATIONS
-        ROT_LEFT,
-        ROT_RIGHT
-    }
 
     //Drive Mode Enum
     private enum DriveMode
@@ -90,7 +68,6 @@ public class RobotTeleOp extends OpMode
 
     //Declaring State controllers
     DriveMode movementMode;
-    Direction direction;
 
 
 
@@ -123,7 +100,6 @@ public class RobotTeleOp extends OpMode
 
         //Declaring starting enum states
         movementMode = DriveMode.FIELD_CENTRIC;
-        direction = Direction.DEFAULT;
 
     }
 
