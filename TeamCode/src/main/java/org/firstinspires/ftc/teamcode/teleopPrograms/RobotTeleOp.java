@@ -26,6 +26,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.IMU;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.hardware.Motor;
 import org.firstinspires.ftc.teamcode.hardware.Servo;
 
@@ -79,6 +80,10 @@ public class RobotTeleOp extends OpMode
         this.motorBL = new Motor(hardwareMap,"motorBL");
         this.motorBR = new Motor(hardwareMap,"motorBR");
 
+            //Reversing Right motors.
+        this.motorFR.reverse();
+        this.motorBR.reverse();
+
         //Servos aren't currently on the robot and thus are commented out.
 
         /*
@@ -86,20 +91,20 @@ public class RobotTeleOp extends OpMode
         this.servo2 = hardwareMap.get(Servo.class, "servo2");
         */
 
-        imu = hardwareMap.get(IMU.class, "imu");
+        this.imu = hardwareMap.get(IMU.class, "imu");
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
                     RevHubOrientationOnRobot.LogoFacingDirection.UP,
                     RevHubOrientationOnRobot.UsbFacingDirection.FORWARD));
-        imu.initialize(parameters);
+        this.imu.initialize(parameters);
 
 
-        gp1 = new Gamepad();
-        gp2 = new Gamepad();
-        prevGp1 = new Gamepad();
-        prevGp2 = new Gamepad();
+        this.gp1 = new Gamepad();
+        this.gp2 = new Gamepad();
+        this.prevGp1 = new Gamepad();
+        this.prevGp2 = new Gamepad();
 
         //Declaring starting enum states
-        movementMode = DriveMode.FIELD_CENTRIC;
+        this.movementMode = DriveMode.FIELD_CENTRIC;
 
     }
 
@@ -116,7 +121,20 @@ public class RobotTeleOp extends OpMode
         else
             fieldCentricMovement();
 
-        //State Machine Handler (Currently Unused)
+        //State Machine Handler
+        /**
+         * GAMEPAD 1 CONTROLS
+         *
+         * Left Stick - Directional Movement
+         * Right Stick - Rotational Movement
+         *
+         * A - Field Centric Drive Mode
+         * B - Robot Centric Drive Mode
+         */
+        if (gp1.a && !prevGp1.a)
+            movementMode = DriveMode.FIELD_CENTRIC;
+        else if (gp1.b && ! prevGp1.b)
+            movementMode = DriveMode.FIELD_CENTRIC;
     }
 
     /**
@@ -135,14 +153,26 @@ public class RobotTeleOp extends OpMode
         double rotate = gp1.right_stick_x;
 
         //Calculate robot centric power first
-        double denominator = Math.max(Math.abs(moveY) + Math.abs(moveX) + Math.abs(rotate), 1);
-        double frontLeftPower = (moveY + moveX + rotate) / denominator;
-        double backLeftPower = (moveY - moveX + rotate) / denominator;
-        double frontRightPower = (moveY - moveX - rotate) / denominator;
-        double backRightPower = (moveY + moveX - rotate) / denominator;
+        if (gamepad1.options) {
+            imu.resetYaw();
+        }
 
-        //Compensates for orientation of robot relative to the field
+        double botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
 
+        // Rotate the movement direction counter to the bot's rotation
+        double rotX = moveX * Math.cos(-botHeading) - moveY * Math.sin(-botHeading);
+        double rotY = moveX * Math.sin(-botHeading) + moveY * Math.cos(-botHeading);
+
+        rotX = rotX * 1.1;  // Counteract imperfect strafing
+
+        // Denominator is the largest motor power (absolute value) or 1
+        // This ensures all the powers maintain the same ratio,
+        // but only if at least one is out of the range [-1, 1]
+        double denominator = Math.max(Math.abs(rotY) + Math.abs(rotX) + Math.abs(rotate), 1);
+        double frontLeftPower = (rotY + rotX + rotate) / denominator;
+        double backLeftPower = (rotY - rotX + rotate) / denominator;
+        double frontRightPower = (rotY - rotX - rotate) / denominator;
+        double backRightPower = (rotY + rotX - rotate) / denominator;
 
         //Applies power
         motorFL.setPower(frontLeftPower);
