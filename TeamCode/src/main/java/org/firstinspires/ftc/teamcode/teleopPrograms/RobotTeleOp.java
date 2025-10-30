@@ -37,23 +37,33 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 @TeleOp(name = "TeleOp v1.0.0.0", group = "Main")
 public class RobotTeleOp extends OpMode
 {
-    //Enums
+    //CONSTANTS
+    public static final double MAX_FLYWHEEL_POWER = 1.0/3.0;
 
-    //Drive Mode Enum
+    //ENUMS
+
+    //Used to determine which movement mode the robot is in
     private enum DriveMode
     {
         FIELD_CENTRIC,
         ROBOT_CENTRIC
     }
 
+    //INSTANCE VARIABLES
+
     //Declaring Misc Hardware
     IMU imu;
 
     //Declaring Motors
+    //Movement Motors
     Motor motorFL;
     Motor motorFR;
     Motor motorBL;
     Motor motorBR;
+
+    //Flywheel Motors
+    Motor motorLFW;
+    Motor motorRFW;
 
     //Declaring Servos
     //CURRENTLY UNUSED
@@ -67,10 +77,12 @@ public class RobotTeleOp extends OpMode
     Gamepad prevGp1;
     Gamepad prevGp2;
 
-    //Declaring State controllers
+    //Declaring State controllers && Boolean logic controllers
+    //State variables
     DriveMode movementMode;
 
-
+    //Boolean variables
+    boolean flywheelsOn;
 
     @Override
     public void init() {
@@ -80,7 +92,11 @@ public class RobotTeleOp extends OpMode
         this.motorBL = new Motor(hardwareMap,"motorBL");
         this.motorBR = new Motor(hardwareMap,"motorBR");
 
-            //Reversing Right motors.
+        //Code for theoretical flywheels
+        this.motorLFW = new Motor(hardwareMap, "motorLFW");
+        this.motorRFW = new Motor(hardwareMap, "motorRFW");
+
+        //Reversing Right motors.
         this.motorFR.reverse();
         this.motorBR.reverse();
 
@@ -106,6 +122,8 @@ public class RobotTeleOp extends OpMode
         //Declaring starting enum states
         this.movementMode = DriveMode.FIELD_CENTRIC;
 
+        this.flywheelsOn = false;
+
     }
 
     @Override
@@ -122,19 +140,46 @@ public class RobotTeleOp extends OpMode
             fieldCentricMovement();
 
         //State Machine Handler
-        /**
-         * GAMEPAD 1 CONTROLS
-         *
+        /** ---------------
+         * GAMEPAD 1 CONTROL
          * Left Stick - Directional Movement
          * Right Stick - Rotational Movement
-         *
          * A - Field Centric Drive Mode
          * B - Robot Centric Drive Mode
+         * X - Toggles flywheels (launching mechanism)
          */
         if (gp1.a && !prevGp1.a)
             movementMode = DriveMode.FIELD_CENTRIC;
-        else if (gp1.b && ! prevGp1.b)
-            movementMode = DriveMode.FIELD_CENTRIC;
+        else if (gp1.b && !prevGp1.b)
+            movementMode = DriveMode.ROBOT_CENTRIC;
+        if (gp1.x && !prevGp1.x)
+            changeFlywheelState();
+
+    }
+
+    /**
+     * toggles whether or not the flywheels are on
+     * also updates boolean variable controlling flywheels
+     */
+    private void changeFlywheelState()
+    {
+        flywheelsOn = !flywheelsOn;
+        double leftPower;
+        double rightPower;
+
+        if (flywheelsOn)
+        {
+            leftPower = MAX_FLYWHEEL_POWER;
+            rightPower = -MAX_FLYWHEEL_POWER;
+        }
+        else
+        {
+            leftPower = 0;
+            rightPower = 0;
+        }
+
+        motorLFW.setPower(leftPower);
+        motorRFW.setPower(rightPower);
     }
 
     /**
