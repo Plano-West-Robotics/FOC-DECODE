@@ -17,6 +17,7 @@ import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.hardware.Motor;
+import org.firstinspires.ftc.teamcode.hardware.Servo;
 
 
 @TeleOp(name = "TeleOp v1.0.0.0", group = "Main")
@@ -24,6 +25,8 @@ public class RobotTeleOp extends OpMode
 {
     //CONSTANTS
     public static final double MAX_FLYWHEEL_POWER = 1.0/3.0;
+    public static final double FLAP_CLOSED_POS = 1;
+    public static final double FLAP_OPEN_POS = 0;
 
     //ENUMS
 
@@ -47,12 +50,10 @@ public class RobotTeleOp extends OpMode
     Motor motorBR;
 
     //Flywheel Motors
-    Motor motorLFW;
-    Motor motorRFW;
+    Motor motorFWs;
 
     //Declaring Servos
-
-    //CURRENTLY ZERO SERVOS
+    Servo servoFlap;
 
     //Declaring GamePads
     //Gamepad 1 controls Movement; Gamepad 2 controls something else.
@@ -78,19 +79,23 @@ public class RobotTeleOp extends OpMode
         this.motorBL = new Motor(hardwareMap,"motorBL");
         this.motorBR = new Motor(hardwareMap,"motorBR");
 
-        //Code for theoretical flywheels
-        this.motorLFW = new Motor(hardwareMap, "motorLFW");
-        this.motorRFW = new Motor(hardwareMap, "motorRFW");
+        //Code for flywheels
+        this.motorFWs = new Motor(hardwareMap, "motorFWs");
 
         //Reversing right motors.
         this.motorFR.reverse();
         this.motorBR.reverse();
-        this.motorRFW.reverse();
+
+        //Servos
+        this.servoFlap = new Servo(hardwareMap, "servoFlap");
 
         this.imu = hardwareMap.get(IMU.class, "imu");
+
+        //Make sure to change LogoFacingDirection and UsbFacingDirection once robot is built
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
                     RevHubOrientationOnRobot.LogoFacingDirection.UP,
                     RevHubOrientationOnRobot.UsbFacingDirection.FORWARD));
+
         this.imu.initialize(parameters);
 
 
@@ -126,15 +131,29 @@ public class RobotTeleOp extends OpMode
         /// A - Field Centric Drive Mode
         /// B - Robot Centric Drive Mode
         /// X - Toggles flywheels (launching mechanism)
+        /// Y - Toggle Flap Servo State
         if (gp1.a && !prevGp1.a)
             movementMode = DriveMode.FIELD_CENTRIC;
         else if (gp1.b && !prevGp1.b)
             movementMode = DriveMode.ROBOT_CENTRIC;
         if (gp1.x && !prevGp1.x)
             changeFlywheelState();
+        if (gp1.y && !prevGp1.y)
+            changeFlapState();
 
     }
 
+    /**
+     * toggles the flap servo to either scoop the ball or reopen the ramp
+     * also updates boolean variable controlling flywheels
+     */
+    private void changeFlapState()
+    {
+        if (servoFlap.getPosition() == FLAP_CLOSED_POS)
+            servoFlap.setPosition(FLAP_OPEN_POS);
+        else
+            servoFlap.setPosition(FLAP_CLOSED_POS);
+    }
     /**
      * toggles whether or not the flywheels are on
      * also updates boolean variable controlling flywheels
@@ -142,22 +161,14 @@ public class RobotTeleOp extends OpMode
     private void changeFlywheelState()
     {
         flywheelsOn = !flywheelsOn;
-        double leftPower;
-        double rightPower;
+        double power;
 
         if (flywheelsOn)
-        {
-            leftPower = MAX_FLYWHEEL_POWER;
-            rightPower = MAX_FLYWHEEL_POWER;
-        }
+            power = MAX_FLYWHEEL_POWER;
         else
-        {
-            leftPower = 0;
-            rightPower = 0;
-        }
+            power = 0;
 
-        motorLFW.setPower(leftPower);
-        motorRFW.setPower(rightPower);
+        motorFWs.setPower(power);
     }
 
     /**
