@@ -18,7 +18,7 @@ import org.firstinspires.ftc.teamcode.hardware.Servo;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.Launcher;
 
-@Autonomous(name = "Robot Autonomous", group = "Main")
+@Autonomous(name = "Robot Autonomous", group = "Autonomous")
 public class RobotAutoOp extends OpMode {
 
     //Hardware Instance Variables

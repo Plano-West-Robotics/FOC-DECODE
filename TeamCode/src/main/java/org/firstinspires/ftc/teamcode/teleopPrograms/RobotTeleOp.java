@@ -21,7 +21,7 @@ import org.firstinspires.ftc.teamcode.hardware.Motor;
 import org.firstinspires.ftc.teamcode.hardware.Servo;
 
 
-@TeleOp(name = "TeleOp v1.0.1.1", group = "Main")
+@TeleOp(name = "TeleOp v1.0.1.1", group = "TeleOp")
 public class RobotTeleOp extends OpMode
 {
     //CONSTANTS
