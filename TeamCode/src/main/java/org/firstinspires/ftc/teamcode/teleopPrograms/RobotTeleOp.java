@@ -1,44 +1,30 @@
 package org.firstinspires.ftc.teamcode.teleopPrograms;
 
-/**
+/*
  * Working TeleOp Control program for the FOC Robot
- * Should have working Field-Centric and Robot-Centric Control mode
+ * Has working Field-Centric and Robot-Centric Control mode
+ * Also has controls for a vertical flywheel setup and a servo to push balls into the flywheels
  *
- * @version 1.0.0.0
- * @date 10/27/2025
+ * @version 1.0.1.1
+ * @date 11/13/2025
  */
 
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.gamepad1;
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
-import static org.firstinspires.ftc.teamcode.pedroPathing.Constants.NINETY;
-import static org.firstinspires.ftc.teamcode.pedroPathing.Constants.ONEEIGHTY;
-
-import com.pedropathing.follower.Follower;
-import com.pedropathing.geometry.BezierCurve;
-import com.pedropathing.geometry.BezierLine;
-import com.pedropathing.geometry.Pose;
-import com.pedropathing.paths.Path;
-import com.pedropathing.util.Timer;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import  com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.subsystems.Launcher;
 import org.firstinspires.ftc.teamcode.hardware.Motor;
 import org.firstinspires.ftc.teamcode.hardware.Servo;
 
 
-import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
-
-
-@TeleOp(name = "TeleOp v1.0.0.0", group = "Main")
+@TeleOp(name = "TeleOp v1.0.1.1", group = "TeleOp")
 public class RobotTeleOp extends OpMode
 {
     //CONSTANTS
-    public static final double MAX_FLYWHEEL_POWER = 1.0/3.0;
 
     //ENUMS
 
@@ -48,7 +34,6 @@ public class RobotTeleOp extends OpMode
         FIELD_CENTRIC,
         ROBOT_CENTRIC
     }
-
 
     //INSTANCE VARIABLES
 
@@ -63,13 +48,13 @@ public class RobotTeleOp extends OpMode
     Motor motorBR;
 
     //Flywheel Motors
-    Motor motorLFW;
-    Motor motorRFW; //Update this
+    Motor motorFWs;
 
     //Declaring Servos
-    //CURRENTLY UNUSED
-    Servo servo1;
-    Servo servo2;
+    Servo servoFlap;
+
+    //Declaring Subsystems
+    Launcher launcher;
 
     //Declaring GamePads
     //Gamepad 1 controls Movement; Gamepad 2 controls something else.
@@ -84,40 +69,38 @@ public class RobotTeleOp extends OpMode
 
     //Boolean variables
     boolean flywheelsOn;
-    boolean intakeOn;
 
     @Override
     public void init() {
         //Declaring hardware parts + gamepads
+
+        //Movement motors
         this.motorFL = new Motor(hardwareMap,"motorFL");
         this.motorFR = new Motor(hardwareMap,"motorFR");
         this.motorBL = new Motor(hardwareMap,"motorBL");
         this.motorBR = new Motor(hardwareMap,"motorBR");
 
-        //Code for theoretical flywheels
-        this.motorLFW = new Motor(hardwareMap, "motorLFW");
-        this.motorRFW = new Motor(hardwareMap, "motorRFW");
+        //Code for flywheels
+        this.motorFWs = new Motor(hardwareMap, "motorFWs");
 
-        //Reversing Right motors.
+        //Reversing right motors.
         this.motorFR.reverse();
         this.motorBR.reverse();
 
-        //Main Motor intake
-        this.motorIK = new Motor(hardwareMap,"motorIK");
-
-        //Servos aren't currently on the robot and thus are commented out.
-
-        /*
-        this.servo1 = hardwareMap.get(Servo.class, "servo1");
-        this.servo2 = hardwareMap.get(Servo.class, "servo2");
-        */
+        //Servos
+        this.servoFlap = new Servo(hardwareMap, "servoFlap");
 
         this.imu = hardwareMap.get(IMU.class, "imu");
+
+        //Make sure to change LogoFacingDirection and UsbFacingDirection once robot is built
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
                     RevHubOrientationOnRobot.LogoFacingDirection.UP,
                     RevHubOrientationOnRobot.UsbFacingDirection.FORWARD));
+
         this.imu.initialize(parameters);
 
+        //Subsystems
+        this.launcher = new Launcher(servoFlap, motorFWs);
 
         this.gp1 = new Gamepad();
         this.gp2 = new Gamepad();
@@ -145,57 +128,33 @@ public class RobotTeleOp extends OpMode
             fieldCentricMovement();
 
         //State Machine Handler
-        /** ---------------
-         * GAMEPAD 1 CONTROL
-         * Left Stick - Directional Movement
-         * Right Stick - Rotational Movement
-         * A - Field Centric Drive Mode
-         * B - Robot Centric Drive Mode
-         * X - Toggles flywheels (launching mechanism)
-         */
+        /// GAMEPAD 1 CONTROLS
+        /// Left Stick - Directional Movement
+        /// Right Stick - Rotational Movement
+        /// A - Field Centric Drive Mode
+        /// B - Robot Centric Drive Mode
+        /// X - Toggles flywheels (launching mechanism)
+        /// Y - Toggle Flap Servo State
         if (gp1.a && !prevGp1.a)
             movementMode = DriveMode.FIELD_CENTRIC;
         else if (gp1.b && !prevGp1.b)
             movementMode = DriveMode.ROBOT_CENTRIC;
         if (gp1.x && !prevGp1.x)
-            changeFlywheelState();
+            launcher.changeFlywheelState();
+        if (gp1.y && !prevGp1.y)
+            launcher.changeFlapState();
 
-    }
-
-    /**
-     * toggles whether or not the flywheels are on
-     * also updates boolean variable controlling flywheels
-     */
-
-    private void changeFlywheelState()
-    {
-        flywheelsOn = !flywheelsOn;
-        double leftPower;
-        double rightPower;
-
-        if (flywheelsOn)
-        {
-            leftPower = MAX_FLYWHEEL_POWER;
-            rightPower = -MAX_FLYWHEEL_POWER;
-        }
-        else
-        {
-            leftPower = 0;
-            rightPower = 0;
-        }
-
-        motorLFW.setPower(leftPower);
-        motorRFW.setPower(rightPower);
     }
 
     /**
      * Moves the robot based on the orientation of the FIELD
+     * MOVEMENT CONTROLS
      * Left joystick moves the robot
      * Right joystick rotates the robot
      * Method also uninverts vertical joystick controls (Up moves up)
-     * Movement is handled before rotation of the robot occurs
-     *
+     * REMINDERS
      * REMEMBER GP1 CONTROLS MOVEMENT AND ROTATION
+     * GP2 DOES CANNOT CONTROL ROBOT MOVEMENT
      */
     private void fieldCentricMovement()
     {
@@ -230,17 +189,17 @@ public class RobotTeleOp extends OpMode
         motorFR.setPower(backLeftPower);
         motorBL.setPower(frontRightPower);
         motorBR.setPower(backRightPower);
-
-
     }
 
     /**
      * Moves the robot based on the orientation of the ROBOT
+     * MOVEMENT CONTROLS
      * Left joystick moves the robot
      * Right joystick rotates the robot
      * Method also uninverts vertical joystick controls (Up moves up)
-     *
+     * REMINDERS
      * REMEMBER GP1 CONTROLS MOVEMENT AND ROTATION
+     * GP2 DOES CANNOT CONTROL ROBOT MOVEMENT
      */
     private void robotCentricMovement()
     {
