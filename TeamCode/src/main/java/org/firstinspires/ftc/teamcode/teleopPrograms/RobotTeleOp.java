@@ -3,10 +3,10 @@ package org.firstinspires.ftc.teamcode.teleopPrograms;
 /*
  * Working TeleOp Control program for the FOC Robot
  * Has working Field-Centric and Robot-Centric Control mode
- * Also has controls for a horizontal flywheel setup
+ * Also has controls for a vertical flywheel setup and a servo to push balls into the flywheels
  *
- * @version 1.0.0.1
- * @date 10/27/2025
+ * @version 1.0.1.1
+ * @date 11/13/2025
  */
 
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
@@ -16,17 +16,15 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.subsystems.Launcher;
 import org.firstinspires.ftc.teamcode.hardware.Motor;
 import org.firstinspires.ftc.teamcode.hardware.Servo;
 
 
-@TeleOp(name = "TeleOp v1.0.0.0", group = "Main")
+@TeleOp(name = "TeleOp v1.0.1.1", group = "Main")
 public class RobotTeleOp extends OpMode
 {
     //CONSTANTS
-    public static final double MAX_FLYWHEEL_POWER = 1.0/3.0;
-    public static final double FLAP_CLOSED_POS = 1;
-    public static final double FLAP_OPEN_POS = 0;
 
     //ENUMS
 
@@ -54,6 +52,9 @@ public class RobotTeleOp extends OpMode
 
     //Declaring Servos
     Servo servoFlap;
+
+    //Declaring Subsystems
+    Launcher launcher;
 
     //Declaring GamePads
     //Gamepad 1 controls Movement; Gamepad 2 controls something else.
@@ -98,6 +99,8 @@ public class RobotTeleOp extends OpMode
 
         this.imu.initialize(parameters);
 
+        //Subsystems
+        this.launcher = new Launcher(servoFlap, motorFWs);
 
         this.gp1 = new Gamepad();
         this.gp2 = new Gamepad();
@@ -137,38 +140,10 @@ public class RobotTeleOp extends OpMode
         else if (gp1.b && !prevGp1.b)
             movementMode = DriveMode.ROBOT_CENTRIC;
         if (gp1.x && !prevGp1.x)
-            changeFlywheelState();
+            launcher.changeFlywheelState();
         if (gp1.y && !prevGp1.y)
-            changeFlapState();
+            launcher.changeFlapState();
 
-    }
-
-    /**
-     * toggles the flap servo to either scoop the ball or reopen the ramp
-     * also updates boolean variable controlling flywheels
-     */
-    private void changeFlapState()
-    {
-        if (servoFlap.getPosition() == FLAP_CLOSED_POS)
-            servoFlap.setPosition(FLAP_OPEN_POS);
-        else
-            servoFlap.setPosition(FLAP_CLOSED_POS);
-    }
-    /**
-     * toggles whether or not the flywheels are on
-     * also updates boolean variable controlling flywheels
-     */
-    private void changeFlywheelState()
-    {
-        flywheelsOn = !flywheelsOn;
-        double power;
-
-        if (flywheelsOn)
-            power = MAX_FLYWHEEL_POWER;
-        else
-            power = 0;
-
-        motorFWs.setPower(power);
     }
 
     /**
