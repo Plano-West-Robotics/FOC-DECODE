@@ -49,7 +49,7 @@ public class ParkOnlyAutoOp extends OpMode {
 
     //Sets up Timer
     private Timer autoTimer;
-    private static double MAX_TIME = 30.0;
+    private static double MAX_TIME = 25.0;
 
 
     /**Initializes the motors, follower, path, and timer

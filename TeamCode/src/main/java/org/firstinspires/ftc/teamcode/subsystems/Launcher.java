@@ -23,8 +23,8 @@ public class Launcher {
     public static double SPIN = 0.75;
 
     //HARDWARE
-    CRServo servoFlap;
-    Motor motorFWs;
+    CRServo servoOUT;
+    Motor motorOUT;
 
     //CONTROL VARIABLES
     boolean flywheelsOn;
@@ -33,12 +33,12 @@ public class Launcher {
 
     public Launcher(CRServo servo, Motor flywheels)
     {
-        this.servoFlap = servo;
-        this.motorFWs = flywheels;
+        this.servoOUT = servo;
+        this.motorOUT = flywheels;
 
 
         //servoFlap.setDirection(CRServo.Direction.REVERSE); //Activate on team consideration
-        motorFWs.setDirection(DcMotorSimple.Direction.REVERSE); //Switched direction
+        motorOUT.setDirection(DcMotorSimple.Direction.REVERSE); //Switched direction
     }
 
     /**
@@ -64,7 +64,7 @@ public class Launcher {
             power = 0;
         }
 
-        servoFlap.setPower(power);
+        servoOUT.setPower(power);
 
 
     }
@@ -82,7 +82,7 @@ public class Launcher {
             power = MAX_FLYWHEEL_POWER;
         else
             power = 0;
-        motorFWs.setPower(power);
+        motorOUT.setPower(power);
     }
 
     /**
@@ -112,7 +112,7 @@ public class Launcher {
      */
     public boolean isFiring()
     {
-        return motorFWs.getPower() != 0;
+        return motorOUT.getPower() != 0;
     }
 
 }
