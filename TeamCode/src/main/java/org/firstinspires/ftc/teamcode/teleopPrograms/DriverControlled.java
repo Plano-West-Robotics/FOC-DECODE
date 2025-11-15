@@ -30,9 +30,9 @@ public class DriverControlled extends OpMode {
         br = hardwareMap.get(DcMotor.class, "br");
         bl = hardwareMap.get(DcMotor.class, "bl");
 
-        servoLoader = hardwareMap.get(CRServo.class, "servo");
-        i = hardwareMap.get(DcMotor.class, "intake");
-        o = hardwareMap.get(DcMotor.class, "transport");
+        servoLoader = hardwareMap.get(CRServo.class, "servoLoader");
+        i = hardwareMap.get(DcMotor.class, "i");
+        o = hardwareMap.get(DcMotor.class, "o");
 
         fr.setDirection(DcMotor.Direction.REVERSE);
         br.setDirection(DcMotor.Direction.REVERSE);
@@ -47,35 +47,21 @@ public class DriverControlled extends OpMode {
         br.setPower(gamepad1.right_stick_y);
 
         //strafing
-        if(gamepad1.left_bumper) {
+        if(gamepad1.dpad_left) {
             fl.setPower(gamepad1.left_trigger);
             fr.setPower(-gamepad1.left_trigger);
             bl.setPower(-gamepad1.left_trigger);
             br.setPower(gamepad1.left_trigger);
         }
-        if(gamepad1.right_bumper) {
+        if(gamepad1.dpad_right) {
             fl.setPower(-gamepad1.right_trigger);
             fr.setPower(gamepad1.right_trigger);
             bl.setPower(gamepad1.right_trigger);
             br.setPower(-gamepad1.right_trigger);
         }
-
-        //arm manual
-        //arm1.setPower(gamepad2.right_stick_y);
-        //arm2.setPower(gamepad2.left_stick_y);
-
-        //arm in sync
-        /*if(gamepad2.dpad_up){
-            arm1.setPower(-1);
-            arm2.setPower(-1);
-        }
-        if(gamepad2.dpad_down){
-            arm1.setPower(1);
-            arm2.setPower(1);
-        }*/
         if(gamepad1.a)
         {
-            servoLoader.setPower(1);
+            servoLoader.setPower(-1);
         }
         if(gamepad1.b)
         {
@@ -85,38 +71,14 @@ public class DriverControlled extends OpMode {
         {
             i.setPower(gamepad1.right_trigger);
         }
-        if(gamepad1.left_trigger > 0)
-        {
-            o.setPower(gamepad1.left_trigger);
+        if(gamepad1.right_trigger == 0){
+            i.setPower(0);
         }
-        //intake
-        /*if(gamepad2.right_trigger > 0){
-            intake.setPower(gamepad2.right_trigger+1000);
+        if(gamepad1.left_trigger > 0) {
+            o.setPower(-gamepad1.left_trigger);
         }
-        if(gamepad2.left_trigger > 0){
-            intake.setPower(-gamepad2.left_trigger-1000);
+        if(gamepad1.left_trigger == 0){
+            o.setPower(0);
         }
-        if(gamepad2.left_trigger == 0 && gamepad2.right_trigger == 0){
-            intake.setPower(0);
-        }
-
-        //hanging
-        if (gamepad2.y) {
-            while (!gamepad2.a){
-                runTime.reset();
-                arm1.setPower(10000);
-                arm2.setPower(10000);
-                if (runTime.time() >= 100){
-                    arm1.setPower(0);
-                    arm2.setPower(0);
-                }
-            }
-        }
-        if (gamepad2.a){
-            while (!gamepad2.y){
-                arm1.setPower(0);
-                arm2.setPower(0);
-            }
-        }*/
     }
 }

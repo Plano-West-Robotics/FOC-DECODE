@@ -37,11 +37,13 @@ public class ParkOnlyAutoOp extends OpMode {
     private Follower follower;
 
     //These values can be adjusted later depending on time
-    private Pose startPose = new Pose(56,8);
+    private Pose startPose = new Pose(56,8); //red
+    //private Pose startPose = new Pose(88, 8); //blue
 
     private Pose connection = new Pose(76,46);
 
-    private Pose parkPose = new Pose(38.718, 33.934);
+    private Pose parkPose = new Pose(38.718, 33.934); //red
+    //private Pose parkPose = (105.282, 33.934); //blue
 
     private Path parkPath;
 
