@@ -36,6 +36,7 @@ public class DriverControlled extends OpMode {
 
         fr.setDirection(DcMotor.Direction.REVERSE);
         br.setDirection(DcMotor.Direction.REVERSE);
+        i.setDirection(DcMotor.Direction.REVERSE);
     }
 
     public void loop(){
@@ -69,7 +70,7 @@ public class DriverControlled extends OpMode {
         }
         if(gamepad1.right_trigger > 0)
         {
-            i.setPower(gamepad1.right_trigger);
+            i.setPower(-gamepad1.right_trigger);
         }
         if(gamepad1.right_trigger == 0){
             i.setPower(0);
