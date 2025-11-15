@@ -18,9 +18,10 @@ import com.qualcomm.robotcore.hardware.IMU;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.hardware.Motor;
 import org.firstinspires.ftc.teamcode.subsystems.Launcher;
+import com.qualcomm.robotcore.hardware.CRServo;
 
 
-@TeleOp(name = "TeleOp v1.0.1.4", group = "TeleOp")
+@TeleOp(name = "TeleOp v1.0.1.3", group = "TeleOp")
 public class RobotTeleOp extends OpMode
 {
     //CONSTANTS
@@ -48,10 +49,10 @@ public class RobotTeleOp extends OpMode
 
     //Intake / Outtake Motors Motors
     Motor motorOUT; // EH Port 3
-    Motor motorIN;
+    Motor motorIN; //EH Port 2
 
     //Declaring Servos
-    // Servo servoLoader; // CH Servo Port 5??
+     CRServo servoLoader; // CH Servo Port 5??
 
     //Declaring Subsystems
     Launcher launcher;
@@ -88,8 +89,8 @@ public class RobotTeleOp extends OpMode
         this.motorFR.reverse();
         this.motorBR.reverse();
 
-        //Servos
-        //this.servoLoader = new Servo(hardwareMap, "servoLoader");
+        //CRServos
+        this.servoLoader = hardwareMap.get(CRServo.class, "servoLoader");
 
         this.imu = hardwareMap.get(IMU.class, "imu");
 
@@ -101,7 +102,7 @@ public class RobotTeleOp extends OpMode
         this.imu.initialize(parameters);
 
         //Subsystems
-        this.launcher = new Launcher(null, motorOUT); //Currently no servo because L
+        this.launcher = new Launcher(servoLoader, motorOUT); //Currently no servo because L
 
         this.gp1 = new Gamepad();
         this.gp2 = new Gamepad();
@@ -135,7 +136,7 @@ public class RobotTeleOp extends OpMode
         /// A - Field Centric Drive Mode
         /// B - Robot Centric Drive Mode
         /// X - Toggles Outtake (launching mechanism)
-        /// Y - Toggles Intake//Toggle Flap Servo State (currently doesn't do anything)
+        /// Y - Toggles Intake//Toggle Flap Servo State (Loading Mechanism)
         if (gp1.a && !prevGp1.a)
             movementMode = DriveMode.FIELD_CENTRIC;
         else if (gp1.b && !prevGp1.b)
@@ -148,6 +149,7 @@ public class RobotTeleOp extends OpMode
                 motorIN.setPower(0);
             else
                 motorIN.setPower(1);
+            launcher.rotateFlap();
         }
     //  if (gp1.y && !prevGp1.y)
     //      launcher.changeFlapState();
@@ -192,6 +194,14 @@ public class RobotTeleOp extends OpMode
         double frontRightPower = (rotY - rotX - rotate) / denominator;
         double backRightPower = (rotY + rotX - rotate) / denominator;
 
+        if(Math.abs(rotX) <= 0.5){
+            frontLeftPower = 0;
+            frontRightPower = 0;
+
+            backLeftPower = rotY + rotate;
+            backRightPower = rotY - rotate;
+        }
+
         //Applies power
         motorFL.setPower(frontLeftPower);
         motorBL.setPower(backLeftPower);
@@ -221,6 +231,14 @@ public class RobotTeleOp extends OpMode
         double backLeftPower = (moveY - moveX + rotate) / denominator;
         double frontRightPower = (moveY - moveX - rotate) / denominator;
         double backRightPower = (moveY + moveX - rotate) / denominator;
+
+        if(Math.abs(moveX) <= 0.3){
+            frontLeftPower = 0;
+            frontRightPower = 0;
+
+            backLeftPower = moveY + rotate;
+            backRightPower = moveY - rotate;
+        }
 
         //Applies Power
         motorFL.setPower(frontLeftPower);

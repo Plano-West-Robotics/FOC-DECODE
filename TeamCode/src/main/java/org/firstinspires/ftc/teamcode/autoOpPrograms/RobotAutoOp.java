@@ -18,6 +18,7 @@ import org.firstinspires.ftc.teamcode.hardware.Motor;
 import org.firstinspires.ftc.teamcode.hardware.Servo;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.Launcher;
+import com.qualcomm.robotcore.hardware.CRServo;
 
 @Autonomous(name = "Robot Autonomous", group = "Autonomous")
 public class RobotAutoOp extends OpMode {
@@ -25,7 +26,7 @@ public class RobotAutoOp extends OpMode {
     //Hardware Instance Variables
     Motor motorFWs;
 
-    Servo servoFlap;
+    CRServo servoFlap;
 
     //Subsystems Instance Variables
     Launcher launcher;
@@ -137,7 +138,7 @@ public class RobotAutoOp extends OpMode {
 
         //Hardware
         this.motorFWs = new Motor(hardwareMap, "motorFWs");
-        this.servoFlap = new Servo(hardwareMap, "servoFlap");
+        this.servoFlap = hardwareMap.get(CRServo.class, "servoFlap");
 
         //Subsystems
         this.launcher = new Launcher(servoFlap, motorFWs);
