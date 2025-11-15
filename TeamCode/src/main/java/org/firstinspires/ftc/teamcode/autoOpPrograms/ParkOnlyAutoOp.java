@@ -48,7 +48,10 @@ public class ParkOnlyAutoOp extends OpMode {
     private Timer moveTimer;
     private static double MAX_TIME = 25.0;
 
+    //Controls the AutoOp
     States state;
+    boolean team; //FALSE = blue; TRUE = red
+
 
 
     /**Initializes the motors, follower, path, and timer
@@ -66,7 +69,9 @@ public class ParkOnlyAutoOp extends OpMode {
         autoTimer = new Timer();
 
         state = States.INIT;
-
+        team = false;
+        //FALSE = BLUE TEAM
+        //TRUE = RED TEAM
     }
 
     /**Resets the timer
@@ -109,10 +114,20 @@ public class ParkOnlyAutoOp extends OpMode {
                 break;
             case SECOND_MOVE:
                 moveTimer.resetTimer();
-                motorFL.setPower(1);
-                motorFR.setPower(-1);
-                motorBL.setPower(-1);
-                motorBR.setPower(1);
+                if (team)
+                {
+                    motorFL.setPower(1);
+                    motorFR.setPower(-1);
+                    motorBL.setPower(-1);
+                    motorBR.setPower(1);
+                }
+                else
+                {
+                    motorFL.setPower(-1);
+                    motorFR.setPower(1);
+                    motorBL.setPower(1);
+                    motorBR.setPower(-1);
+                }
 
                 if (moveTimer.getElapsedTimeSeconds() >= MOVE_TIME || autoTimer.getElapsedTimeSeconds() >= MAX_TIME)
                 {
