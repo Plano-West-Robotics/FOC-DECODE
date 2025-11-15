@@ -43,7 +43,7 @@ public class ParkOnlyAutoOp extends OpMode {
     private Pose connection = new Pose(76,46);
 
     private Pose parkPose = new Pose(38.718, 33.934); //red
-    //private Pose parkPose = (105.282, 33.934); //blu
+    //private Pose parkPose = (105.282, 33.934); //blue
 
     private Path parkPath;
 
@@ -110,6 +110,7 @@ public class ParkOnlyAutoOp extends OpMode {
      *
      */
     private void buildTheParkingPath(){
-
+        parkPath = new Path(new BezierCurve(startPose, connection, parkPose));
+        parkPath.setLinearHeadingInterpolation(0, NINETY);
     }
 }
