@@ -68,12 +68,12 @@ public class DriverControlled extends OpMode {
         {
             servoLoader.setPower(0);
         }
-        if(gamepad1.right_trigger > 0)
+        if(gamepad1.x)
         {
-            i.setPower(-gamepad1.right_trigger);
+            i.setPower(-1);
         }
-        if(gamepad1.right_trigger == 0){
-            i.setPower(0);
+        if(gamepad1.y){
+            i.setPower(1);
         }
         if(gamepad1.left_trigger > 0) {
             o.setPower(-gamepad1.left_trigger);
