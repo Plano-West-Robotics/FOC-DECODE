@@ -38,7 +38,7 @@ public class RobotTeleOp extends OpMode
     //INSTANCE VARIABLES
 
     //Declaring Misc Hardware
-    IMU imu;
+    IMU imu; //Orientation is finalized for meet
 
     //Declaring Motors
     //Movement Motors
@@ -51,7 +51,7 @@ public class RobotTeleOp extends OpMode
     Motor motorFWs;
 
     //Declaring Servos
-    Servo servoFlap;
+    // Servo servoFlap;
 
     //Declaring Subsystems
     Launcher launcher;
@@ -88,19 +88,19 @@ public class RobotTeleOp extends OpMode
         this.motorBR.reverse();
 
         //Servos
-        this.servoFlap = new Servo(hardwareMap, "servoFlap");
+        //this.servoFlap = new Servo(hardwareMap, "servoFlap");
 
         this.imu = hardwareMap.get(IMU.class, "imu");
 
         //Make sure to change LogoFacingDirection and UsbFacingDirection once robot is built
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
-                    RevHubOrientationOnRobot.LogoFacingDirection.UP,
-                    RevHubOrientationOnRobot.UsbFacingDirection.FORWARD));
+                    RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
+                    RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD));
 
         this.imu.initialize(parameters);
 
         //Subsystems
-        this.launcher = new Launcher(servoFlap, motorFWs);
+        this.launcher = new Launcher(null, motorFWs); //Currently no servo because L
 
         this.gp1 = new Gamepad();
         this.gp2 = new Gamepad();
@@ -134,15 +134,15 @@ public class RobotTeleOp extends OpMode
         /// A - Field Centric Drive Mode
         /// B - Robot Centric Drive Mode
         /// X - Toggles flywheels (launching mechanism)
-        /// Y - Toggle Flap Servo State
+        /// Y - Toggle Flap Servo State (currently doesn't do anything)
         if (gp1.a && !prevGp1.a)
             movementMode = DriveMode.FIELD_CENTRIC;
         else if (gp1.b && !prevGp1.b)
             movementMode = DriveMode.ROBOT_CENTRIC;
         if (gp1.x && !prevGp1.x)
             launcher.changeFlywheelState();
-        if (gp1.y && !prevGp1.y)
-            launcher.changeFlapState();
+       //* if (gp1.y && !prevGp1.y)
+           // launcher.changeFlapState();
 
     }
 
