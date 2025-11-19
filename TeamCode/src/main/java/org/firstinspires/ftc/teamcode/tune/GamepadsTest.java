@@ -10,7 +10,7 @@ import org.firstinspires.ftc.teamcode.tuningSubsystems.Gamepads;
 
 import com.qualcomm.robotcore.hardware.CRServo;
 
-@TeleOp(name = "GamepadTester", group = "Testing")
+@TeleOp(name = "GamepadTester", group = "TeleOp")
 public class GamepadsTest extends OpMode
 {
     public Gamepads gamepads;

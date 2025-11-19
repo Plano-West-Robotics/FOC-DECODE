@@ -42,9 +42,10 @@ public class DriverControlled extends OpMode {
     public void loop(){
 
         //forward backward turning
-        fl.setPower(gamepad1.left_stick_y);
         fr.setPower(gamepad1.right_stick_y);
         bl.setPower(gamepad1.left_stick_y);
+
+        fl.setPower(gamepad1.left_stick_y);
         br.setPower(gamepad1.right_stick_y);
 
         //strafing
