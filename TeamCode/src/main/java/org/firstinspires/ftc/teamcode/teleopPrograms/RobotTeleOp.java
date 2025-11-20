@@ -220,10 +220,31 @@ public class RobotTeleOp extends OpMode
      */
     private void robotCentricMovement()
     {
-        double moveY = -gp1.left_stick_y;
-        double moveX = gp1.left_stick_x * 1.1;
-        double rotate = gp1.right_stick_x;
+            double y = -gamepad1.left_stick_y; // Remember, Y stick value is reversed
+            double x = gamepad1.left_stick_x * 1.1; // Counteract imperfect strafing
+            double rx = gamepad1.right_stick_x;
 
+            // Denominator is the largest motor power (absolute value) or 1
+            // This ensures all the powers maintain the same ratio,
+            // but only if at least one is out of the range [-1, 1]
+            double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
+            double frontLeftPower = (y + x + rx) / denominator;
+            double backLeftPower = (y - x + rx) / denominator;
+            double frontRightPower = (y - x - rx) / denominator;
+            double backRightPower = (y + x - rx) / denominator;
+
+            motorFL.setPower(frontLeftPower);
+            motorBL.setPower(backLeftPower);
+            motorFR.setPower(frontRightPower);
+            motorBR.setPower(backRightPower);
+
+
+       /* double moveY = -gp1.left_stick_y;
+        double moveX = gp1.left_stick_x * 1.1;
+        double rotate = gp1.right_stick_x; */
+
+
+    /*
         //Calculates necessary power
         double denominator = Math.max(Math.abs(moveY) + Math.abs(moveX) + Math.abs(rotate), 1);
         double frontLeftPower = (moveY + moveX + rotate) / denominator;
@@ -231,11 +252,18 @@ public class RobotTeleOp extends OpMode
         double frontRightPower = (moveY - moveX - rotate) / denominator;
         double backRightPower = (moveY + moveX - rotate) / denominator;
 
+
+        double frontLeftPower = (moveY + rotate);
+        double backLeftPower = (moveY + rotate);
+        double frontRightPower = (moveY - rotate);
+        double backRightPower = (moveY - rotate);
+
         //Applies Power
         motorFL.setPower(frontLeftPower);
-        motorBL.setPower(backLeftPower);
+        motorBL.setPower(frontLeftPower);
         motorFR.setPower(frontRightPower);
-        motorBR.setPower(backRightPower);
+        motorBR.setPower(frontRightPower);
+        */
     }
 
 }

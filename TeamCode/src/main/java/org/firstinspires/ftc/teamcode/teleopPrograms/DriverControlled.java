@@ -48,7 +48,7 @@ public class DriverControlled extends OpMode {
         br.setPower(gamepad1.right_stick_y);
 
         //strafing
-        if(gamepad1.dpad_left) {
+        /*if(gamepad1.dpad_left) {
             fl.setPower(gamepad1.left_trigger);
             fr.setPower(-gamepad1.left_trigger);
             bl.setPower(-gamepad1.left_trigger);
@@ -59,7 +59,22 @@ public class DriverControlled extends OpMode {
             fr.setPower(gamepad1.right_trigger);
             bl.setPower(gamepad1.right_trigger);
             br.setPower(-gamepad1.right_trigger);
+        }*/
+        if(gamepad1.left_trigger > 0 ){
+            double leftStrafe = gamepad1.left_trigger;
+            fl.setPower(leftStrafe);
+            fr.setPower(-leftStrafe);
+            bl.setPower(-leftStrafe);
+            br.setPower(leftStrafe);
         }
+        if(gamepad1.right_trigger > 0 ){
+            double rightStrafe = gamepad1.right_trigger;
+            fl.setPower(-rightStrafe);
+            fr.setPower(rightStrafe);
+            bl.setPower(rightStrafe);
+            br.setPower(-rightStrafe);
+        }
+
         if(gamepad1.a)
         {
             servoLoader.setPower(-1);
@@ -68,7 +83,7 @@ public class DriverControlled extends OpMode {
         {
             servoLoader.setPower(0);
         }
-        if(gamepad1.right_trigger > 0)
+       /* if(gamepad1.right_trigger > 0)
         {
             i.setPower(-gamepad1.right_trigger);
         }
@@ -80,6 +95,6 @@ public class DriverControlled extends OpMode {
         }
         if(gamepad1.left_trigger == 0){
             o.setPower(0);
-        }
+        }*/
     }
 }
