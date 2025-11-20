@@ -40,7 +40,7 @@ public class ParkOnlyAutoOp extends OpMode {
     private Pose startPose = new Pose(56,8); //red
     //private Pose startPose = new Pose(88, 8); //blue
 
-    private Pose connection = new Pose(76,46);
+    private Pose connection = new Pose(76,46); //ignore
 
     private Pose parkPose = new Pose(38.718, 33.934); //red
     //private Pose parkPose = (105.282, 33.934); //blue
