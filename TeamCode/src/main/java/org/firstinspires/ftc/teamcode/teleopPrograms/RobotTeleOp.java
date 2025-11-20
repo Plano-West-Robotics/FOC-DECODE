@@ -86,8 +86,8 @@ public class RobotTeleOp extends OpMode
         this.motorIN = new Motor(hardwareMap, "i");
 
         //Reversing right motors.
-        this.motorFR.reverse();
-        this.motorBR.reverse();
+        this.motorFL.reverse();
+        this.motorBL.reverse();
 
         //CRServos
         this.servoLoader = hardwareMap.get(CRServo.class, "servoLoader");
@@ -100,6 +100,7 @@ public class RobotTeleOp extends OpMode
                     RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD));
 
         this.imu.initialize(parameters);
+        this.imu.resetYaw();
 
         //Subsystems
         this.launcher = new Launcher(servoLoader, motorOUT); //Currently no servo because L
@@ -194,19 +195,17 @@ public class RobotTeleOp extends OpMode
         double frontRightPower = (rotY - rotX - rotate) / denominator;
         double backRightPower = (rotY + rotX - rotate) / denominator;
 
-        if(Math.abs(rotX) <= 0.5){
-            frontLeftPower = 0;
-            frontRightPower = 0;
-
-            backLeftPower = rotY + rotate;
-            backRightPower = rotY - rotate;
-        }
-
         //Applies power
         motorFL.setPower(frontLeftPower);
         motorBL.setPower(backLeftPower);
         motorFR.setPower(frontRightPower);
         motorBR.setPower(backRightPower);
+
+        //Telemetry
+        telemetry.addLine("fL: " + frontLeftPower);
+        telemetry.addLine("fR: " + frontRightPower);
+        telemetry.addLine("bR: " + backRightPower);
+        telemetry.addLine("bL: " + backLeftPower);
     }
 
     /**
@@ -222,7 +221,7 @@ public class RobotTeleOp extends OpMode
     private void robotCentricMovement()
     {
         double moveY = -gp1.left_stick_y;
-        double moveX = gp1.left_stick_x;
+        double moveX = gp1.left_stick_x * 1.1;
         double rotate = gp1.right_stick_x;
 
         //Calculates necessary power
@@ -231,14 +230,6 @@ public class RobotTeleOp extends OpMode
         double backLeftPower = (moveY - moveX + rotate) / denominator;
         double frontRightPower = (moveY - moveX - rotate) / denominator;
         double backRightPower = (moveY + moveX - rotate) / denominator;
-
-        if(Math.abs(moveX) <= 0.3){
-            frontLeftPower = 0;
-            frontRightPower = 0;
-
-            backLeftPower = moveY + rotate;
-            backRightPower = moveY - rotate;
-        }
 
         //Applies Power
         motorFL.setPower(frontLeftPower);
