@@ -18,6 +18,7 @@ import com.qualcomm.robotcore.hardware.IMU;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.hardware.Motor;
 import org.firstinspires.ftc.teamcode.subsystems.Launcher;
+import org.firstinspires.ftc.teamcode.subsystems.LauncherTwo;
 import com.qualcomm.robotcore.hardware.CRServo;
 
 
@@ -51,11 +52,14 @@ public class RobotTeleOp extends OpMode
     Motor motorOUT; // EH Port 3
     Motor motorIN; //EH Port 2
 
+    Motor motorTFER; //EH Servo Port 4??
+
     //Declaring Servos
-     CRServo servoLoader; // CH Servo Port 5??
+     CRServo servoLoader; // EH Servo Port 5??
 
     //Declaring Subsystems
     Launcher launcher;
+    LauncherTwo launcher2;
 
     //Declaring GamePads
     //Gamepad 1 controls Movement; Gamepad 2 controls something else.
@@ -70,6 +74,8 @@ public class RobotTeleOp extends OpMode
 
     //Boolean variables
     boolean flywheelsOn;
+    boolean inoutOn;
+    boolean transferOn;
 
     @Override
     public void init() {
@@ -84,8 +90,9 @@ public class RobotTeleOp extends OpMode
         //Code for intake and outtake;
         this.motorOUT = new Motor(hardwareMap, "o");
         this.motorIN = new Motor(hardwareMap, "i");
+        this.motorTFER = new Motor(hardwareMap,"t"); //Just added this in case
 
-        //Reversing right motors.
+        //Reversing left motors.
         this.motorFL.reverse();
         this.motorBL.reverse();
 
@@ -103,7 +110,8 @@ public class RobotTeleOp extends OpMode
         this.imu.resetYaw();
 
         //Subsystems
-        this.launcher = new Launcher(servoLoader, motorOUT); //Currently no servo because L
+        //this.launcher = new Launcher(servoLoader, motorOUT); //Currently no servo because L
+        this.launcher2 = new LauncherTwo(motorIN, motorTFER, motorOUT);
 
         this.gp1 = new Gamepad();
         this.gp2 = new Gamepad();
@@ -114,6 +122,8 @@ public class RobotTeleOp extends OpMode
         this.movementMode = DriveMode.FIELD_CENTRIC;
 
         this.flywheelsOn = false;
+        this.inoutOn = false;
+        this.transferOn = false;
 
     }
 
@@ -143,14 +153,16 @@ public class RobotTeleOp extends OpMode
         else if (gp1.b && !prevGp1.b)
             movementMode = DriveMode.ROBOT_CENTRIC;
         if (gp1.x && !prevGp1.x)
-            launcher.changeFlywheelState();
+            //launcher.changeFlywheelState();
+            launcher2.inOutChange();
         if (gp1.y && !prevGp1.y)
         {
-            if (motorIN.getPower() == 1)
+            launcher2.transferChange();
+            /*if (motorIN.getPower() == 1)
                 motorIN.setPower(0);
             else
                 motorIN.setPower(1);
-            launcher.rotateFlap();
+            launcher.rotateFlap();*/
         }
     //  if (gp1.y && !prevGp1.y)
     //      launcher.changeFlapState();
