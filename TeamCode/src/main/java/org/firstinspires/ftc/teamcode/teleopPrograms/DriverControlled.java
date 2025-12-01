@@ -75,7 +75,7 @@ public class DriverControlled extends OpMode {
             br.setPower(-rightStrafe);
         }
 
-        if(gamepad1.a)
+       /* if(gamepad1.a)
         {
             servoLoader.setPower(-1);
         }

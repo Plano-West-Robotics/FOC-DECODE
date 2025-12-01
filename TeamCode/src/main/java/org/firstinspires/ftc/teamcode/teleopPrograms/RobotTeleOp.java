@@ -146,8 +146,8 @@ public class RobotTeleOp extends OpMode
         /// Right Stick - Rotational Movement
         /// A - Field Centric Drive Mode
         /// B - Robot Centric Drive Mode
-        /// X - Toggles Outtake (launching mechanism)
-        /// Y - Toggles Intake//Toggle Flap Servo State (Loading Mechanism)
+        /// X - Toggles Intake/Outtake (Loading/Output Mechanism)
+        /// Y - Toggles Transfer State (Transfer Mechanism)
         if (gp1.a && !prevGp1.a)
             movementMode = DriveMode.FIELD_CENTRIC;
         else if (gp1.b && !prevGp1.b)
