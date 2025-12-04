@@ -5,8 +5,8 @@ package org.firstinspires.ftc.teamcode.teleopPrograms;
  * Has working Field-Centric and Robot-Centric Control mode
  * Also has controls for a vertical flywheel setup and a servo to push balls into the flywheels
  *
- * @version 1.0.1.1
- * @date 11/13/2025
+ * @version 1.1.2.5
+ * @date 12/1/2025
  */
 
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
@@ -22,7 +22,7 @@ import org.firstinspires.ftc.teamcode.subsystems.LauncherTwo;
 import com.qualcomm.robotcore.hardware.CRServo;
 
 
-@TeleOp(name = "TeleOp v1.0.1.3", group = "TeleOp")
+@TeleOp(name = "TeleOp v1.1.2.5", group = "TeleOp")
 public class RobotTeleOp extends OpMode
 {
     //CONSTANTS
@@ -52,7 +52,7 @@ public class RobotTeleOp extends OpMode
     Motor motorOUT; // EH Port 3
     Motor motorIN; //EH Port 2
 
-    Motor motorTFER; //EH Servo Port 4??
+    Motor motorTFER; //EH Port 1
 
     //Declaring Servos
      CRServo servoLoader; // EH Servo Port 5??
@@ -86,6 +86,11 @@ public class RobotTeleOp extends OpMode
         this.motorFR = new Motor(hardwareMap,"fr");
         this.motorBL = new Motor(hardwareMap,"bl");
         this.motorBR = new Motor(hardwareMap,"br");
+
+        motorFL.setPower(0);
+        motorBL.setPower(0);
+        motorFR.setPower(0);
+        motorBR.setPower(0);
 
         //Code for intake and outtake;
         this.motorOUT = new Motor(hardwareMap, "o");

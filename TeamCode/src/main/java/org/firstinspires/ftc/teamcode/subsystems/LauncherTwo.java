@@ -7,7 +7,8 @@ import org.firstinspires.ftc.teamcode.hardware.Motor;
 public class LauncherTwo {
 
     //CLASS CONSTANTS (not yet finalized)
-    public static double inoutPower = 0.6;
+    public static double inPower = 0.6;
+    public static double outPower = 1;
     public static double transferPower = 0.2;
 
     //HARDWARE
@@ -24,6 +25,8 @@ public class LauncherTwo {
          this.transferMotor = transfer;
          this.outtakeMotor = output;
 
+         this.transferMotor.reverse();
+
          intakeMotor.setDirection(DcMotorSimple.Direction.FORWARD);
          transferMotor.setDirection(DcMotorSimple.Direction.FORWARD);
          outtakeMotor.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -35,16 +38,19 @@ public class LauncherTwo {
      */
     public void inOutChange(){
          inoutOn = !inoutOn;
-         double power;
+         double powIn;
+         double powOut;
 
          if(inoutOn){
-             power = inoutPower;
+             powIn = inPower;
+             powOut = outPower;
          }
          else{
-             power = 0;
+             powIn = 0;
+             powOut = 0;
          }
-         intakeMotor.setPower(power);
-         outtakeMotor.setPower(power);
+         intakeMotor.setPower(powIn);
+         outtakeMotor.setPower(powOut);
      }
 
 
@@ -57,7 +63,7 @@ public class LauncherTwo {
          double power;
 
          if(transferOn){
-             power = transferPower;
+             power = -transferPower;
          }
          else{
              power = 0;
