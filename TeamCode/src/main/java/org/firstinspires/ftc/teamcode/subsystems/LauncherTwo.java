@@ -7,9 +7,9 @@ import org.firstinspires.ftc.teamcode.hardware.Motor;
 public class LauncherTwo {
 
     //CLASS CONSTANTS (not yet finalized)
-    public static double inPower = 0.6;
-    public static double outPower = 1;
-    public static double transferPower = 0.2;
+    public static double inPower = 1;
+    public static double outPower = 0.7;
+    public static double transferPower = 1;
 
     //HARDWARE
      Motor intakeMotor;
