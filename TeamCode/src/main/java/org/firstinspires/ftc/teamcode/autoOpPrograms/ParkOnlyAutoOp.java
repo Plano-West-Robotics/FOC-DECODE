@@ -88,33 +88,28 @@ public class ParkOnlyAutoOp extends OpMode {
         switch(state)
         {
             case INIT:
+                moveTimer.resetTimer();
                 state = States.FIRST_MOVE;
                 break;
             case FIRST_MOVE:
-                moveTimer.resetTimer();
                 motorFL.setPower(1);
                 motorFR.setPower(1);
                 motorBL.setPower(1);
                 motorBR.setPower(1);
 
-                if (moveTimer.getElapsedTimeSeconds() >= 1)
-                {
+                if (moveTimer.getElapsedTimeSeconds() >= 1) {
+                    moveTimer.resetTimer();
                     state = States.SECOND_MOVE;
-                }
-                else if (autoTimer.getElapsedTimeSeconds() >= MOVE_TIME * 1.5)
-                {
-                    state = States.END;
                 }
 
                 break;
             case SECOND_MOVE:
-                moveTimer.resetTimer();
                 motorFL.setPower(1);
                 motorFR.setPower(-1);
                 motorBL.setPower(-1);
                 motorBR.setPower(1);
 
-                if (moveTimer.getElapsedTimeSeconds() >= MOVE_TIME || autoTimer.getElapsedTimeSeconds() >= MAX_TIME)
+                if (moveTimer.getElapsedTimeSeconds() >= 1.5)
                 {
                     state = States.END;
                 }
