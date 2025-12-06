@@ -8,7 +8,7 @@ public class LauncherTwo {
 
     //CLASS CONSTANTS (not yet finalized)
     public static double inPower = 1;
-    public static double outPower = 0.7;
+    public static double outPower = 0.75;
     public static double transferPower = 1;
 
     //HARDWARE
