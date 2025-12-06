@@ -157,9 +157,13 @@ public class RobotTeleOp extends OpMode
             movementMode = DriveMode.FIELD_CENTRIC;
         else if (gp1.b && !prevGp1.b)
             movementMode = DriveMode.ROBOT_CENTRIC;
-        if (gp1.x && !prevGp1.x)
+        if (gp1.left_bumper && !prevGp1.left_bumper)
             //launcher.changeFlywheelState();
-            launcher2.inOutChange();
+            launcher2.inChange();
+        if (gp1.right_bumper && !prevGp1.right_bumper)
+            //launcher.changeFlywheelState();
+            launcher2.outChange();
+
         if (gp1.y && !prevGp1.y)
         {
             launcher2.transferChange();

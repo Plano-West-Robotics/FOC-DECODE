@@ -17,7 +17,9 @@ public class LauncherTwo {
      Motor outtakeMotor;
 
      //CONTROL VARIABLES
-    boolean inoutOn;
+    boolean inOn;
+
+    boolean outOn;
     boolean transferOn;
 
      public LauncherTwo(Motor input, Motor transfer, Motor output){
@@ -36,22 +38,31 @@ public class LauncherTwo {
      * Toggles whether the intake/outtake is on or not
      * Updates the boolean controlling the intake/outtake
      */
-    public void inOutChange(){
-         inoutOn = !inoutOn;
+    public void inChange(){
+         inOn = !inOn;
          double powIn;
-         double powOut;
 
-         if(inoutOn){
+         if(inOn){
              powIn = inPower;
-             powOut = outPower;
          }
          else{
              powIn = 0;
-             powOut = 0;
          }
          intakeMotor.setPower(powIn);
-         outtakeMotor.setPower(powOut);
      }
+
+    public void outChange(){
+        outOn = !outOn;
+        double powOut;
+
+        if(inOn){
+            powOut = outPower;
+        }
+        else{
+            powOut = 0;
+        }
+        outtakeMotor.setPower(powOut);
+    }
 
 
     /**
