@@ -18,18 +18,22 @@ import org.firstinspires.ftc.teamcode.hardware.Motor;
 import org.firstinspires.ftc.teamcode.hardware.Servo;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.Launcher;
+import org.firstinspires.ftc.teamcode.subsystems.LauncherTwo;
+
 import com.qualcomm.robotcore.hardware.CRServo;
 
 @Autonomous(name = "Robot Autonomous", group = "Autonomous")
 public class RobotAutoOp extends OpMode {
 
     //Hardware Instance Variables
-    Motor motorFWs;
+    Motor motorIN;
+    Motor motorTFER;
+    Motor motorOUT;
 
     CRServo servoFlap;
 
     //Subsystems Instance Variables
-    Launcher launcher;
+    LauncherTwo launcher;
 
     //Pedro Pathing Instance Variables
     private Follower follower;
@@ -86,37 +90,44 @@ public class RobotAutoOp extends OpMode {
     }
 
     public void autoFSM() {
-        switch(pathState)
-        {
+        switch (pathState) {
             case INIT:
                 if (opmodeTimer.getElapsedTime() >= INIT_SECONDS)
                     setPathState(BasicStates.TO_ARTIFACT);
                 break;
+
             case TO_ARTIFACT:
-                follower.followPath(toArtifactPath, true); // holdEnd means it will stay at the point after reaching it
+                follower.followPath(toArtifactPath, true);
+                // holdEnd means it will stay at the point after reaching it
 
                 // move to the next state when the path has completed
                 if (!follower.isBusy())
                     setPathState(BasicStates.TO_SCORING);
                 break;
+
             case TO_SCORING:
                 follower.followPath(toLaunchPath, true);
 
                 if (!follower.isBusy())
                     setPathState(BasicStates.AT_SCORING);
                 break;
+
             case AT_SCORING:
-                if(pathTimer.getElapsedTime() >= LAUNCH_SECONDS)
+                if (pathTimer.getElapsedTime() >= LAUNCH_SECONDS)
                     setPathState(BasicStates.PARK);
+
                 break;
+
             case PARK:
                 follower.followPath(toEndPath, true);
 
                 if (!follower.isBusy())
                     setPathState(BasicStates.IDLE);
                 break;
+
             case IDLE:
                 break;
+
             default:
                 System.out.println("FSM System reached an undefined state");
                 break;
@@ -137,11 +148,12 @@ public class RobotAutoOp extends OpMode {
         this.opmodeTimer.resetTimer();
 
         //Hardware
-        this.motorFWs = new Motor(hardwareMap, "motorFWs");
-        this.servoFlap = hardwareMap.get(CRServo.class, "servoFlap");
+        this.motorOUT = new Motor(hardwareMap, "o");
+        this.motorIN = new Motor(hardwareMap, "i");
+        this.motorTFER = new Motor(hardwareMap,"t");
 
         //Subsystems
-        this.launcher = new Launcher(servoFlap, motorFWs);
+        this.launcher = new LauncherTwo(motorIN, motorTFER, motorOUT);
 
         this.follower = Constants.createFollower(hardwareMap);
         buildPaths();
@@ -168,8 +180,20 @@ public class RobotAutoOp extends OpMode {
         telemetry.update();
     }
 
+    //PRIVATE METHODS
 
+    private void collectBalls()
+    {
+        launcher.inChange();
+    }
 
+    private void transferBalls()
+    {
+        launcher.transferChange();
+    }
 
-
+    private void launchBalls()
+    {
+        launcher.outChange();
+    }
 }
