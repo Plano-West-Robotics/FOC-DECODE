@@ -108,8 +108,8 @@ public class RobotTeleOp extends OpMode
 
         //Make sure to change LogoFacingDirection and UsbFacingDirection once robot is built
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
-                    RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
-                    RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD));
+                    RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
+                    RevHubOrientationOnRobot.UsbFacingDirection.FORWARD));
 
         this.imu.initialize(parameters);
         this.imu.resetYaw();
