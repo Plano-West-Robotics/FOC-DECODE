@@ -6,6 +6,10 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+import org.firstinspires.ftc.teamcode.hardware.Motor;
+import org.firstinspires.ftc.teamcode.subsystems.LauncherTwo;
+import com.qualcomm.robotcore.hardware.Gamepad;
+
 @TeleOp(name="Driver Controlled")
 
 public class DriverControlled extends OpMode {
@@ -13,10 +17,14 @@ public class DriverControlled extends OpMode {
     private DcMotor fl;
     private DcMotor br;
     private DcMotor bl;
+     Motor motorOUT;
+     Motor motorIN;
+     Motor motorTFER;
 
-    private CRServo servoLoader;
-    private DcMotor i;
-    private DcMotor o;
+     LauncherTwo launcher2;
+
+
+     Gamepad prevGp2;
 
     public void runOpMode(){
 
@@ -30,13 +38,18 @@ public class DriverControlled extends OpMode {
         br = hardwareMap.get(DcMotor.class, "br");
         bl = hardwareMap.get(DcMotor.class, "bl");
 
-        servoLoader = hardwareMap.get(CRServo.class, "servoLoader");
-        i = hardwareMap.get(DcMotor.class, "i");
-        o = hardwareMap.get(DcMotor.class, "o");
+        this.motorOUT = new Motor(hardwareMap, "o");
+        this.motorIN = new Motor(hardwareMap, "i");
+        this.motorTFER = new Motor(hardwareMap,"t"); //Just added this in case
+        this.launcher2 = new LauncherTwo(motorIN, motorTFER, motorOUT);
 
         fr.setDirection(DcMotor.Direction.REVERSE);
         br.setDirection(DcMotor.Direction.REVERSE);
-        i.setDirection(DcMotor.Direction.REVERSE);
+        motorIN.setDirection(DcMotor.Direction.REVERSE);
+
+        this.prevGp2 = new Gamepad();
+
+
     }
 
     public void loop(){
@@ -47,19 +60,6 @@ public class DriverControlled extends OpMode {
         bl.setPower(gamepad1.left_stick_y);
         br.setPower(gamepad1.right_stick_y);
 
-        //strafing
-        /*if(gamepad1.dpad_left) {
-            fl.setPower(gamepad1.left_trigger);
-            fr.setPower(-gamepad1.left_trigger);
-            bl.setPower(-gamepad1.left_trigger);
-            br.setPower(gamepad1.left_trigger);
-        }
-        if(gamepad1.dpad_right) {
-            fl.setPower(-gamepad1.right_trigger);
-            fr.setPower(gamepad1.right_trigger);
-            bl.setPower(gamepad1.right_trigger);
-            br.setPower(-gamepad1.right_trigger);
-        }*/
         if(gamepad1.left_trigger > 0 ){
             double leftStrafe = gamepad1.left_trigger;
             fl.setPower(leftStrafe);
@@ -74,27 +74,29 @@ public class DriverControlled extends OpMode {
             bl.setPower(rightStrafe);
             br.setPower(-rightStrafe);
         }
-
-       /* if(gamepad1.a)
+        /*if(gamepad2.right_trigger > 0)
         {
-            servoLoader.setPower(-1);
+            i.setPower(gamepad2.right_trigger);
         }
-        if(gamepad1.b)
+        if(gamepad2.left_trigger > 0)
         {
-            servoLoader.setPower(0);
-        }
-       /* if(gamepad1.right_trigger > 0)
-        {
-            i.setPower(-gamepad1.right_trigger);
-        }
-        if(gamepad1.right_trigger == 0){
-            i.setPower(0);
-        }
-        if(gamepad1.left_trigger > 0) {
-            o.setPower(-gamepad1.left_trigger);
-        }
-        if(gamepad1.left_trigger == 0){
-            o.setPower(0);
+            i.setPower(-gamepad2.left_trigger);
         }*/
+
+       if(gamepad2.a && !prevGp2.a){
+            launcher2.inChange();
+       }
+
+        if(gamepad2.y && !prevGp2.y){
+            launcher2.transferChange();
+        }
+
+        if(gamepad2.b && !prevGp2.b){
+            launcher2.outChange();
+        }
+
+
+        prevGp2.copy(gamepad2);
+
     }
 }
