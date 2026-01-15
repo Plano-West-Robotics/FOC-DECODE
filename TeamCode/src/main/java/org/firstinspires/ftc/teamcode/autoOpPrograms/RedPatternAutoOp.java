@@ -1,0 +1,212 @@
+package org.firstinspires.ftc.teamcode.autoOpPrograms;
+
+import com.pedropathing.follower.Follower;
+import com.pedropathing.geometry.BezierCurve;
+import com.pedropathing.geometry.BezierLine;
+import com.pedropathing.geometry.Pose;
+import com.pedropathing.paths.Path;
+import com.pedropathing.util.Timer;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.CRServo;
+
+import org.firstinspires.ftc.teamcode.hardware.Motor;
+import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
+import org.firstinspires.ftc.teamcode.subsystems.LauncherTwo;
+
+@Autonomous(name = "Red Auto with Motifs", group = "Autonomous")
+public class RedPatternAutoOp extends OpMode {
+
+    //State Enum
+    public enum BasicStates
+    {
+        INIT,
+        TO_MOTIF,
+        SCANNING_MOTIF,
+        TO_ARTIFACT,
+        COLLECTING,
+        TO_SCORING,
+        FIRING,
+        PARK,
+        IDLE
+    }
+
+    //Pose & Angle Constants
+    private final double START_ANGLE = Math.toRadians(90);
+    private final double COLLECTION_ANGLE = Math.toRadians(180);
+    private final double LAUNCH_ANGLE = Math.toRadians(49);
+    private final double END_ANGLE = Math.toRadians(90);
+
+    private final Pose START_POSE = new Pose(88, 8);
+    private final Pose TOP_ARTI_POSE = new Pose(100,84);
+    private final Pose MID_ARTI_POSE = new Pose(100,60);
+    private final Pose BOT_ARTI_POSE = new Pose(100,36);
+    private final Pose SCORING_POSE = new Pose(72,75);
+
+    //Timer Constants
+
+    public static final int INIT_SECONDS = 1;
+    public static final int LAUNCH_SECONDS = 5;
+    public static final int ROUND_SECONDS = 27;
+
+
+    //Hardware Instance Variables
+    Motor motorIN;
+    Motor motorTFER;
+    Motor motorOUT;
+
+    //Subsystems Instance Variables
+    LauncherTwo launcher;
+
+    //Pedro Pathing Instance Variables
+    private Follower follower;
+    private Timer pathTimer, actionTimer, opmodeTimer;
+    private BasicStates pathState;
+    private int motifID;
+
+    private Pose collectBalls;
+    private Path toArtifactPath;
+    private Path toScorePath;
+    private Path toEndPath;
+
+    public void buildPaths()
+    {
+
+        toScorePath = new Path(
+                new BezierLine(
+                        START_POSE,
+                        SCORING_POSE
+                )
+        );
+        toScorePath.setLinearHeadingInterpolation(START_ANGLE, LAUNCH_ANGLE);
+    }
+
+    public void autoFSM() {
+        if (opmodeTimer.getElapsedTimeSeconds() >= ROUND_SECONDS)
+            setPathState(BasicStates.PARK);
+        switch (pathState) {
+            case INIT:
+                if (opmodeTimer.getElapsedTime() >= INIT_SECONDS)
+                    setPathState(BasicStates.TO_ARTIFACT);
+                break;
+
+            case TO_MOTIF:
+                follower.followPath(toScorePath, true);
+
+                if(!follower.isBusy())
+                    setPathState(BasicStates.SCANNING_MOTIF);
+                break;
+
+            case SCANNING_MOTIF:
+                //Do stuff with camera to set motifID to the correct id.
+                int tempID = 22;
+                motifID = tempID;
+
+                //Set toArtifactPath to the proper artifact
+
+                //Dont forget to wait until it finishes scanning
+                if (true /*PLACEHOLDER*/ )
+                    setPathState(BasicStates.TO_ARTIFACT);
+
+                break;
+
+            case TO_ARTIFACT:
+                follower.followPath(toArtifactPath, true);
+                // holdEnd means it will stay at the point after reaching it
+                // IDK the ids so these are all just placeholders rn
+                switch(motifID)
+                {
+                    case 22:
+
+                        break;
+                    case 23:
+
+                        break;
+                    case 21:
+
+                        break;
+                    default:
+
+                        break;
+                }
+
+                // move to the next state when the path has completed
+                if (!follower.isBusy())
+                    setPathState(BasicStates.TO_SCORING);
+                break;
+
+            case TO_SCORING:
+                follower.followPath(toScorePath, true);
+
+                if (!follower.isBusy())
+                    setPathState(BasicStates.FIRING);
+                break;
+
+            case FIRING:
+                if (pathTimer.getElapsedTime() >= LAUNCH_SECONDS)
+                    setPathState(BasicStates.PARK);
+
+                break;
+
+            case PARK:
+                follower.followPath(toEndPath, true);
+
+                if (!follower.isBusy())
+                    setPathState(BasicStates.IDLE);
+                break;
+
+            case IDLE:
+                break;
+
+            default:
+                System.out.println("FSM System reached an undefined state");
+                break;
+        }
+    }
+
+    public void setPathState(BasicStates state)
+    {
+        pathState = state;
+        pathTimer.resetTimer();
+    }
+
+    @Override
+    public void init() {
+        //Timers
+        this.pathTimer = new Timer();
+        this.opmodeTimer = new Timer();
+        this.opmodeTimer.resetTimer();
+
+        //Hardware
+        this.motorOUT = new Motor(hardwareMap, "o");
+        this.motorIN = new Motor(hardwareMap, "i");
+        this.motorTFER = new Motor(hardwareMap,"t");
+
+        //Subsystems
+        this.launcher = new LauncherTwo(motorIN, motorTFER, motorOUT);
+
+        this.follower = Constants.createFollower(hardwareMap);
+        buildPaths();
+        this.follower.setStartingPose(START_POSE);
+    }
+
+    @Override
+    public void start()
+    {
+        opmodeTimer.resetTimer();
+        setPathState(BasicStates.INIT);
+    }
+
+    @Override
+    public void loop() {
+        follower.update();
+        autoFSM(); // need to constantly check the state machine status
+
+        // as the program is running, you can view the status of the robot for debugging
+        telemetry.addData("path state:", pathState);
+        telemetry.addData("x:", follower.getPose().getX());
+        telemetry.addData("y:", follower.getPose().getY());
+        telemetry.addData("heading:", follower.getPose().getHeading());
+        telemetry.update();
+    }
+}
