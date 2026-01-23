@@ -34,14 +34,17 @@ public class RedPatternAutoOp extends OpMode {
     //Pose & Angle Constants
     private final double START_ANGLE = Math.toRadians(90);
     private final double COLLECTION_ANGLE = Math.toRadians(180);
-    private final double LAUNCH_ANGLE = Math.toRadians(49);
+    private final double LAUNCH_ANGLE = Math.toRadians(63.5);
+    private final double SCAN_ANGLE = Math.toRadians(90);
     private final double END_ANGLE = Math.toRadians(90);
 
     private final Pose START_POSE = new Pose(88, 8);
     private final Pose TOP_ARTI_POSE = new Pose(100,84);
     private final Pose MID_ARTI_POSE = new Pose(100,60);
     private final Pose BOT_ARTI_POSE = new Pose(100,36);
-    private final Pose SCORING_POSE = new Pose(72,75);
+    private final Pose SCORING_POSE = new Pose(82,12);
+    private final Pose SCANNING_POSE = new Pose(85,85);
+    private final int COLLECTION_DISTANCE = 32;
 
     //Timer Constants
 
@@ -64,30 +67,36 @@ public class RedPatternAutoOp extends OpMode {
     private BasicStates pathState;
     private int motifID;
 
-    private Pose collectBalls;
+    private Path collectBallsPath;
     private Path toArtifactPath;
+    private Path toScanPath;
     private Path toScorePath;
     private Path toEndPath;
 
+    /**
+     * CURRENTLY UNUSED
+     */
     public void buildPaths()
     {
 
-        toScorePath = new Path(
+        toScanPath = new Path(
                 new BezierLine(
                         START_POSE,
-                        SCORING_POSE
+                        SCANNING_POSE
                 )
         );
-        toScorePath.setLinearHeadingInterpolation(START_ANGLE, LAUNCH_ANGLE);
+        toScorePath.setLinearHeadingInterpolation(START_ANGLE, SCAN_ANGLE);
+
     }
 
     public void autoFSM() {
         if (opmodeTimer.getElapsedTimeSeconds() >= ROUND_SECONDS)
             setPathState(BasicStates.PARK);
+
         switch (pathState) {
             case INIT:
                 if (opmodeTimer.getElapsedTime() >= INIT_SECONDS)
-                    setPathState(BasicStates.TO_ARTIFACT);
+                    setPathState(BasicStates.TO_SCORING);
                 break;
 
             case TO_MOTIF:
@@ -103,37 +112,82 @@ public class RedPatternAutoOp extends OpMode {
                 motifID = tempID;
 
                 //Set toArtifactPath to the proper artifact
+                // IDK the ids so these are all just placeholders rn
+                switch(motifID)
+                {   //MOTIFS MATCH...
+                    case 22: //TOP ARTIFACT PATTERN
+                        toArtifactPath = new Path(
+                                new BezierLine(
+                                        follower.getPose(),
+                                        TOP_ARTI_POSE
+                                )
+                        );
+                        toArtifactPath.setLinearHeadingInterpolation(follower.getHeading(),COLLECTION_ANGLE);
+
+                        break;
+                    case 23: //MIDDLE ARTIFACT PATTERN
+                        toArtifactPath = new Path(
+                                new BezierLine(
+                                        follower.getPose(),
+                                        MID_ARTI_POSE
+                                )
+                        );
+                        toArtifactPath.setLinearHeadingInterpolation(follower.getHeading(),COLLECTION_ANGLE);
+
+                        collectBallsPath = new Path(
+                                new BezierLine(
+                                        MID_ARTI_POSE,
+                                        new Pose(MID_ARTI_POSE.getX() + COLLECTION_DISTANCE, MID_ARTI_POSE.getY())
+                                )
+                        );
+                        toArtifactPath.setLinearHeadingInterpolation(COLLECTION_ANGLE, COLLECTION_ANGLE);
+
+                        break;
+                    case 24: //BOTTOM ARTIFACT PATTERN
+                        toArtifactPath = new Path(
+                                new BezierLine(
+                                        follower.getPose(),
+                                        BOT_ARTI_POSE
+                                        )
+                        );
+                        toArtifactPath.setLinearHeadingInterpolation(follower.getHeading(),COLLECTION_ANGLE);
+
+                        break;
+                    default: //Defaults to collecting the artifacts
+                        toArtifactPath = new Path(
+                                new BezierLine(
+                                        follower.getPose(),
+                                        BOT_ARTI_POSE
+                                )
+                        );
+                        toArtifactPath.setLinearHeadingInterpolation(follower.getHeading(),COLLECTION_ANGLE);
+
+                        break;
+                }
 
                 //Dont forget to wait until it finishes scanning
                 if (true /*PLACEHOLDER*/ )
+                {
                     setPathState(BasicStates.TO_ARTIFACT);
+                }
 
                 break;
+
 
             case TO_ARTIFACT:
                 follower.followPath(toArtifactPath, true);
                 // holdEnd means it will stay at the point after reaching it
-                // IDK the ids so these are all just placeholders rn
-                switch(motifID)
-                {
-                    case 22:
-
-                        break;
-                    case 23:
-
-                        break;
-                    case 21:
-
-                        break;
-                    default:
-
-                        break;
-                }
 
                 // move to the next state when the path has completed
                 if (!follower.isBusy())
                     setPathState(BasicStates.TO_SCORING);
                 break;
+
+
+            case COLLECTING:
+
+
+
 
             case TO_SCORING:
                 follower.followPath(toScorePath, true);
@@ -142,11 +196,13 @@ public class RedPatternAutoOp extends OpMode {
                     setPathState(BasicStates.FIRING);
                 break;
 
+
             case FIRING:
                 if (pathTimer.getElapsedTime() >= LAUNCH_SECONDS)
                     setPathState(BasicStates.PARK);
 
                 break;
+
 
             case PARK:
                 follower.followPath(toEndPath, true);
@@ -155,8 +211,10 @@ public class RedPatternAutoOp extends OpMode {
                     setPathState(BasicStates.IDLE);
                 break;
 
+
             case IDLE:
                 break;
+
 
             default:
                 System.out.println("FSM System reached an undefined state");
@@ -186,7 +244,6 @@ public class RedPatternAutoOp extends OpMode {
         this.launcher = new LauncherTwo(motorIN, motorTFER, motorOUT);
 
         this.follower = Constants.createFollower(hardwareMap);
-        buildPaths();
         this.follower.setStartingPose(START_POSE);
     }
 
