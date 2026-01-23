@@ -23,13 +23,20 @@ public class CameraSetup {
     public static final double CY = 2.425865530229235674e2;
 
     public static final int TAG_BLUE = 20;
+    public static int TAG_21 = 21;
+    public static int TAG_22 = 22;
+    public static int TAG_23 = 23;
     public static final int TAG_RED = 24;
+
+    public int tagID;
 
     private double xOff = 0;
     private double yOff = 0;
     private double dist = 0;
 
     private boolean hasTag = false;
+
+
 
     public CameraSetup(HardwareMap hardwaremap){
 
@@ -45,10 +52,11 @@ public class CameraSetup {
         hasTag = false;
 
         for (AprilTagDetection tag: detections){
-            if(tag.id == TAG_BLUE || tag.id == TAG_RED){
+            if(tag.id == TAG_BLUE || tag.id == TAG_RED || tag.id == TAG_21 || tag.id == TAG_22 ||tag.id == TAG_23 ){
                 xOff = tag.ftcPose.x;
                 yOff = tag.ftcPose.y;
                 dist = tag.ftcPose.range;
+                tagID = tag.id;
                 hasTag = true;
                 return;
             }
@@ -71,6 +79,10 @@ public class CameraSetup {
 
     public double getDist(){
         return dist;
+    }
+
+    public int getTag(){
+        return tagID;
     }
 
     public void stop(){

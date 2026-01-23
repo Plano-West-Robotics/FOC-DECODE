@@ -12,6 +12,7 @@ import com.qualcomm.robotcore.hardware.CRServo;
 
 import org.firstinspires.ftc.teamcode.hardware.Motor;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
+import org.firstinspires.ftc.teamcode.subsystems.CameraSetup;
 import org.firstinspires.ftc.teamcode.subsystems.LauncherTwo;
 
 @Autonomous(name = "Red Auto with Motifs", group = "Autonomous")
@@ -63,6 +64,7 @@ public class RedPatternAutoOp extends OpMode {
 
     //Pedro Pathing Instance Variables
     private Follower follower;
+    private CameraSetup camera;
     private Timer pathTimer, actionTimer, opmodeTimer;
     private BasicStates pathState;
     private int motifID;
@@ -107,15 +109,16 @@ public class RedPatternAutoOp extends OpMode {
                 break;
 
             case SCANNING_MOTIF:
+                camera.update();
                 //Do stuff with camera to set motifID to the correct id.
-                int tempID = 22;
-                motifID = tempID;
-
+                if (camera.hasTagCheck()){
+                    motifID = camera.getTag();
+                }
                 //Set toArtifactPath to the proper artifact
                 // IDK the ids so these are all just placeholders rn
                 switch(motifID)
                 {   //MOTIFS MATCH...
-                    case 22: //TOP ARTIFACT PATTERN
+                    case 21: //TOP ARTIFACT PATTERN
                         toArtifactPath = new Path(
                                 new BezierLine(
                                         follower.getPose(),
@@ -125,7 +128,7 @@ public class RedPatternAutoOp extends OpMode {
                         toArtifactPath.setLinearHeadingInterpolation(follower.getHeading(),COLLECTION_ANGLE);
 
                         break;
-                    case 23: //MIDDLE ARTIFACT PATTERN
+                    case 22: //MIDDLE ARTIFACT PATTERN
                         toArtifactPath = new Path(
                                 new BezierLine(
                                         follower.getPose(),
@@ -143,7 +146,7 @@ public class RedPatternAutoOp extends OpMode {
                         toArtifactPath.setLinearHeadingInterpolation(COLLECTION_ANGLE, COLLECTION_ANGLE);
 
                         break;
-                    case 24: //BOTTOM ARTIFACT PATTERN
+                    case 23: //BOTTOM ARTIFACT PATTERN
                         toArtifactPath = new Path(
                                 new BezierLine(
                                         follower.getPose(),
@@ -245,6 +248,7 @@ public class RedPatternAutoOp extends OpMode {
 
         this.follower = Constants.createFollower(hardwareMap);
         this.follower.setStartingPose(START_POSE);
+        this.camera = new CameraSetup(hardwareMap);
     }
 
     @Override
@@ -257,6 +261,7 @@ public class RedPatternAutoOp extends OpMode {
     @Override
     public void loop() {
         follower.update();
+        camera.update();
         autoFSM(); // need to constantly check the state machine status
 
         // as the program is running, you can view the status of the robot for debugging

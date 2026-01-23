@@ -24,8 +24,13 @@ public class Constants {
     public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1, 1);
 
     public static TwoWheelConstants localizerConstants = new TwoWheelConstants()
-            .forwardEncoder_HardwareMapName("leftFront")
-            .strafeEncoder_HardwareMapName("rightRear")
+            .forwardEncoder_HardwareMapName("odoY")
+            .strafeEncoder_HardwareMapName("odoX")
+            .forwardEncoderDirection(Encoder.FORWARD)
+            .strafeEncoderDirection(Encoder.FORWARD)
+            .forwardTicksToInches(0.0005053) //Calculate and calibrate this to fit odopods
+            .strafeTicksToInches(0.0005053)
+            .strafePodX(6)//Measure and calculate offset from center
             .IMU_HardwareMapName("imu")
             .IMU_Orientation(
                     new RevHubOrientationOnRobot(
