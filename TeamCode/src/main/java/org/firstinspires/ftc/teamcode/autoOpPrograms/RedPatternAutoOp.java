@@ -45,6 +45,7 @@ public class RedPatternAutoOp extends OpMode {
     private final Pose BOT_ARTI_POSE = new Pose(100,36);
     private final Pose SCORING_POSE = new Pose(82,12);
     private final Pose SCANNING_POSE = new Pose(85,85);
+    private final Pose END_POSE = new Pose(100,100);
     private final int COLLECTION_DISTANCE = 32;
 
     //Timer Constants
@@ -80,6 +81,13 @@ public class RedPatternAutoOp extends OpMode {
      */
     public void buildPaths()
     {
+        toScorePath = new Path(
+                new BezierLine(
+                        START_POSE,
+                        SCORING_POSE
+                )
+        );
+        toScorePath.setLinearHeadingInterpolation(START_ANGLE, LAUNCH_ANGLE);
 
         toScanPath = new Path(
                 new BezierLine(
@@ -87,7 +95,7 @@ public class RedPatternAutoOp extends OpMode {
                         SCANNING_POSE
                 )
         );
-        toScorePath.setLinearHeadingInterpolation(START_ANGLE, SCAN_ANGLE);
+        toScanPath.setLinearHeadingInterpolation(LAUNCH_ANGLE, SCAN_ANGLE);
 
     }
 
@@ -102,7 +110,7 @@ public class RedPatternAutoOp extends OpMode {
                 break;
 
             case TO_MOTIF:
-                follower.followPath(toScorePath, true);
+                follower.followPath(toScanPath, true);
 
                 if(!follower.isBusy())
                     setPathState(BasicStates.SCANNING_MOTIF);
@@ -114,6 +122,8 @@ public class RedPatternAutoOp extends OpMode {
                 if (camera.hasTagCheck()){
                     motifID = camera.getTag();
                 }
+
+                boolean scanned = false;
                 //Set toArtifactPath to the proper artifact
                 // IDK the ids so these are all just placeholders rn
                 switch(motifID)
@@ -127,7 +137,16 @@ public class RedPatternAutoOp extends OpMode {
                         );
                         toArtifactPath.setLinearHeadingInterpolation(follower.getHeading(),COLLECTION_ANGLE);
 
+                        collectBallsPath = new Path(
+                                new BezierLine(
+                                        TOP_ARTI_POSE,
+                                        new Pose(TOP_ARTI_POSE.getX() + COLLECTION_DISTANCE, TOP_ARTI_POSE.getY())
+                                )
+                        );
+                        toArtifactPath.setLinearHeadingInterpolation(COLLECTION_ANGLE, COLLECTION_ANGLE);
+                        scanned = true;
                         break;
+
                     case 22: //MIDDLE ARTIFACT PATTERN
                         toArtifactPath = new Path(
                                 new BezierLine(
@@ -144,8 +163,9 @@ public class RedPatternAutoOp extends OpMode {
                                 )
                         );
                         toArtifactPath.setLinearHeadingInterpolation(COLLECTION_ANGLE, COLLECTION_ANGLE);
-
+                        scanned = true;
                         break;
+
                     case 23: //BOTTOM ARTIFACT PATTERN
                         toArtifactPath = new Path(
                                 new BezierLine(
@@ -155,8 +175,17 @@ public class RedPatternAutoOp extends OpMode {
                         );
                         toArtifactPath.setLinearHeadingInterpolation(follower.getHeading(),COLLECTION_ANGLE);
 
+                        collectBallsPath = new Path(
+                                new BezierLine(
+                                        BOT_ARTI_POSE,
+                                        new Pose(BOT_ARTI_POSE.getX() + COLLECTION_DISTANCE, BOT_ARTI_POSE.getY())
+                                )
+                        );
+                        toArtifactPath.setLinearHeadingInterpolation(COLLECTION_ANGLE, COLLECTION_ANGLE);
+                        scanned = true;
                         break;
-                    default: //Defaults to collecting the artifacts
+
+                    default: //Defaults to collecting the bottom artifacts currently
                         toArtifactPath = new Path(
                                 new BezierLine(
                                         follower.getPose(),
@@ -165,11 +194,19 @@ public class RedPatternAutoOp extends OpMode {
                         );
                         toArtifactPath.setLinearHeadingInterpolation(follower.getHeading(),COLLECTION_ANGLE);
 
+                        collectBallsPath = new Path(
+                                new BezierLine(
+                                        BOT_ARTI_POSE,
+                                        new Pose(BOT_ARTI_POSE.getX() + COLLECTION_DISTANCE, BOT_ARTI_POSE.getY())
+                                )
+                        );
+                        toArtifactPath.setLinearHeadingInterpolation(COLLECTION_ANGLE, COLLECTION_ANGLE);
+                        scanned = true;
                         break;
                 }
 
                 //Dont forget to wait until it finishes scanning
-                if (true /*PLACEHOLDER*/ )
+                if (scanned /*PLACEHOLDER*/ )
                 {
                     setPathState(BasicStates.TO_ARTIFACT);
                 }
@@ -183,14 +220,15 @@ public class RedPatternAutoOp extends OpMode {
 
                 // move to the next state when the path has completed
                 if (!follower.isBusy())
-                    setPathState(BasicStates.TO_SCORING);
+                    setPathState(BasicStates.COLLECTING);
                 break;
 
-
             case COLLECTING:
+                follower.followPath(collectBallsPath, true);
 
-
-
+                if (!follower.isBusy())
+                    setPathState(BasicStates.COLLECTING);
+                break;
 
             case TO_SCORING:
                 follower.followPath(toScorePath, true);
@@ -201,6 +239,8 @@ public class RedPatternAutoOp extends OpMode {
 
 
             case FIRING:
+                //CURRENTLY UNIMPLEMENTED
+
                 if (pathTimer.getElapsedTime() >= LAUNCH_SECONDS)
                     setPathState(BasicStates.PARK);
 
