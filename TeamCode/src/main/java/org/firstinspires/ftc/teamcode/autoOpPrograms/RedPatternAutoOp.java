@@ -102,7 +102,13 @@ public class RedPatternAutoOp extends OpMode {
 
     public void autoFSM() {
         if (opmodeTimer.getElapsedTimeSeconds() >= ROUND_SECONDS)
+        {
+            motorIN.setPower(0);
+            motorTFER.setPower(0);
+            motorOUT.setPower(0);
+
             setPathState(BasicStates.PARK);
+        }
 
         switch (pathState) {
             case INIT:
@@ -240,9 +246,20 @@ public class RedPatternAutoOp extends OpMode {
 
             case FIRING:
                 actionTimer.resetTimer();
-                //CURRENTLY UNIMPLEMENTED
+
+                double robDis = camera.getDist();
+                double outPower = (15 * Math.PI) * ((19.6 * Math.pow(robDis, 2))/((Math.sqrt(3) * robDis) - 15.75));
+                motorIN.setPower(-0.1);
+                motorTFER.setPower(0.26);
+                motorOUT.setPower(0.6);
+
                 if (actionTimer.getElapsedTime() >= LAUNCH_SECONDS)
                 {
+
+                    motorIN.setPower(0);
+                    motorTFER.setPower(0);
+                    motorOUT.setPower(0);
+
                     if (preloaded) {
                         setPathState(BasicStates.TO_MOTIF);
                         preloaded = false;
@@ -265,12 +282,15 @@ public class RedPatternAutoOp extends OpMode {
 
 
             case IDLE:
-                //Used to wait for teleOp
+                //Used to wait for the end of AutoOp
                 break;
 
 
             default:
                 System.out.println("FSM System reached an undefined state");
+                motorIN.setPower(0);
+                motorTFER.setPower(0);
+                motorOUT.setPower(0);
                 follower.followPath(toEndPath, true);
                 break;
         }
