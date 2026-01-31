@@ -30,7 +30,7 @@ public class Constants {
             .strafeEncoderDirection(Encoder.FORWARD)
             .forwardTicksToInches(0.0005053) //Calculate and calibrate this to fit odopods
             .strafeTicksToInches(0.0005053)
-            .strafePodX(6)//Measure and calculate offset from center
+            .strafePodX(4.5)//Measure and calculate offset from center
             .IMU_HardwareMapName("imu")
             .IMU_Orientation(
                     new RevHubOrientationOnRobot(
