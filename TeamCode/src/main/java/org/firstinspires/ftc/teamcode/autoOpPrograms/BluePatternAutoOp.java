@@ -15,8 +15,8 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.CameraSetup;
 import org.firstinspires.ftc.teamcode.subsystems.LauncherTwo;
 
-@Autonomous(name = "Red AutoOp with Bottom Start", group = "Autonomous")
-public class RedPatternAutoOp extends OpMode {
+@Autonomous(name = "Blue AutoOp with Bottom Start", group = "Autonomous")
+public class BluePatternAutoOp extends OpMode {
 
     //State Enum
     public enum BasicStates
@@ -34,18 +34,18 @@ public class RedPatternAutoOp extends OpMode {
 
     //Pose & Angle Constants
     private final double START_ANGLE = Math.toRadians(90);
-    private final double COLLECTION_ANGLE = Math.toRadians(180);
-    private final double LAUNCH_ANGLE = Math.toRadians(63.5);
+    private final double COLLECTION_ANGLE = Math.toRadians(0);
+    private final double LAUNCH_ANGLE = Math.toRadians(116.5);
     private final double SCAN_ANGLE = Math.toRadians(90);
     private final double END_ANGLE = Math.toRadians(90);
 
-    private final Pose START_POSE = new Pose(88, 8);
-    private final Pose TOP_ARTI_POSE = new Pose(100,84);
-    private final Pose MID_ARTI_POSE = new Pose(100,60);
-    private final Pose BOT_ARTI_POSE = new Pose(100,36);
-    private final Pose SCORING_POSE = new Pose(82,12);
-    private final Pose SCANNING_POSE = new Pose(85,85);
-    private final Pose END_POSE = new Pose(100,30);
+    private final Pose START_POSE = new Pose(56, 8);
+    private final Pose TOP_ARTI_POSE = new Pose(44,84);
+    private final Pose MID_ARTI_POSE = new Pose(44,60);
+    private final Pose BOT_ARTI_POSE = new Pose(44,36);
+    private final Pose SCORING_POSE = new Pose(62,12);
+    private final Pose SCANNING_POSE = new Pose(59,85);
+    private final Pose END_POSE = new Pose(44,30);
     private final int COLLECTION_DISTANCE = 32;
 
     //Timer Constants
@@ -146,7 +146,7 @@ public class RedPatternAutoOp extends OpMode {
                         collectBallsPath = new Path(
                                 new BezierLine(
                                         TOP_ARTI_POSE,
-                                        new Pose(TOP_ARTI_POSE.getX() + COLLECTION_DISTANCE, TOP_ARTI_POSE.getY())
+                                        new Pose(TOP_ARTI_POSE.getX() - COLLECTION_DISTANCE, TOP_ARTI_POSE.getY())
                                 )
                         );
                         toArtifactPath.setLinearHeadingInterpolation(COLLECTION_ANGLE, COLLECTION_ANGLE);
@@ -165,7 +165,7 @@ public class RedPatternAutoOp extends OpMode {
                         collectBallsPath = new Path(
                                 new BezierLine(
                                         MID_ARTI_POSE,
-                                        new Pose(MID_ARTI_POSE.getX() + COLLECTION_DISTANCE, MID_ARTI_POSE.getY())
+                                        new Pose(MID_ARTI_POSE.getX() - COLLECTION_DISTANCE, MID_ARTI_POSE.getY())
                                 )
                         );
                         toArtifactPath.setLinearHeadingInterpolation(COLLECTION_ANGLE, COLLECTION_ANGLE);
@@ -177,14 +177,14 @@ public class RedPatternAutoOp extends OpMode {
                                 new BezierLine(
                                         follower.getPose(),
                                         BOT_ARTI_POSE
-                                        )
+                                )
                         );
                         toArtifactPath.setLinearHeadingInterpolation(follower.getHeading(),COLLECTION_ANGLE);
 
                         collectBallsPath = new Path(
                                 new BezierLine(
                                         BOT_ARTI_POSE,
-                                        new Pose(BOT_ARTI_POSE.getX() + COLLECTION_DISTANCE, BOT_ARTI_POSE.getY())
+                                        new Pose(BOT_ARTI_POSE.getX() - COLLECTION_DISTANCE, BOT_ARTI_POSE.getY())
                                 )
                         );
                         toArtifactPath.setLinearHeadingInterpolation(COLLECTION_ANGLE, COLLECTION_ANGLE);
@@ -203,7 +203,7 @@ public class RedPatternAutoOp extends OpMode {
                         collectBallsPath = new Path(
                                 new BezierLine(
                                         BOT_ARTI_POSE,
-                                        new Pose(BOT_ARTI_POSE.getX() + COLLECTION_DISTANCE, BOT_ARTI_POSE.getY())
+                                        new Pose(BOT_ARTI_POSE.getX() - COLLECTION_DISTANCE, BOT_ARTI_POSE.getY())
                                 )
                         );
                         toArtifactPath.setLinearHeadingInterpolation(COLLECTION_ANGLE, COLLECTION_ANGLE);
