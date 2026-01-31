@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.teleopPrograms;
 
-import com.qualcomm.robotcore.hardware.CRServo;
+//import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+//import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
@@ -9,6 +10,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import org.firstinspires.ftc.teamcode.hardware.Motor;
 import org.firstinspires.ftc.teamcode.subsystems.LauncherTwo;
 import com.qualcomm.robotcore.hardware.Gamepad;
+//import com.qualcomm.robotcore.hardware.IMU;
 
 @TeleOp(name="Driver Controlled")
 
@@ -20,6 +22,8 @@ public class DriverControlled extends OpMode {
      Motor motorOUT;
      Motor motorIN;
      Motor motorTFER;
+
+     //IMU imu;
 
      LauncherTwo launcher2;
 
@@ -42,6 +46,16 @@ public class DriverControlled extends OpMode {
         this.motorIN = new Motor(hardwareMap, "i");
         this.motorTFER = new Motor(hardwareMap,"t"); //Just added this in case
         this.launcher2 = new LauncherTwo(motorIN, motorTFER, motorOUT);
+
+        //this.imu = hardwareMap.get(IMU.class, "imu");
+
+        //Make sure to change LogoFacingDirection and UsbFacingDirection once robot is built
+        /*IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
+                RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
+                RevHubOrientationOnRobot.UsbFacingDirection.FORWARD));
+
+        this.imu.initialize(parameters);
+        this.imu.resetYaw();*/
 
         fr.setDirection(DcMotor.Direction.REVERSE);
         br.setDirection(DcMotor.Direction.REVERSE);

@@ -24,8 +24,8 @@ public class Constants {
     public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1, 1);
 
     public static TwoWheelConstants localizerConstants = new TwoWheelConstants()
-            .forwardEncoder_HardwareMapName("fl")
-            .strafeEncoder_HardwareMapName("fr")
+            .forwardEncoder_HardwareMapName("br")
+            .strafeEncoder_HardwareMapName("bl")
             .forwardEncoderDirection(Encoder.FORWARD)
             .strafeEncoderDirection(Encoder.FORWARD)
             .forwardTicksToInches(0.0005025 * 3.96) //Calculate and calibrate this to fit odopods
