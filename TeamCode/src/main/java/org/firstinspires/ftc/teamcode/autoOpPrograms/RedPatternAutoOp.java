@@ -79,6 +79,47 @@ public class RedPatternAutoOp extends OpMode {
     /**
      * CURRENTLY UNUSED
      */
+
+    @Override
+    public void init() {
+        //Timers
+        this.pathTimer = new Timer();
+        this.opmodeTimer = new Timer();
+        this.opmodeTimer.resetTimer();
+
+        //Hardware
+        this.motorOUT = new Motor(hardwareMap, "o");
+        this.motorIN = new Motor(hardwareMap, "i");
+        this.motorTFER = new Motor(hardwareMap,"t");
+
+        //Subsystems
+        this.launcher = new LauncherTwo(motorIN, motorTFER, motorOUT);
+
+        this.follower = Constants.createFollower(hardwareMap);
+        this.follower.setStartingPose(START_POSE);
+        this.camera = new CameraSetup(hardwareMap);
+    }
+
+    @Override
+    public void start()
+    {
+        opmodeTimer.resetTimer();
+        setPathState(BasicStates.INIT);
+    }
+
+    @Override
+    public void loop() {
+        follower.update();
+        camera.update();
+        autoFSM(); // need to constantly check the state machine status
+
+        // as the program is running, you can view the status of the robot for debugging
+        telemetry.addData("path state:", pathState);
+        telemetry.addData("x:", follower.getPose().getX());
+        telemetry.addData("y:", follower.getPose().getY());
+        telemetry.addData("heading:", follower.getPose().getHeading());
+        telemetry.update();
+    }
     public void buildPaths()
     {
         toScorePath = new Path(
@@ -206,7 +247,7 @@ public class RedPatternAutoOp extends OpMode {
                 }
 
                 //Dont forget to wait until it finishes scanning
-                if (scanned /*PLACEHOLDER*/ )
+                if (scanned)
                 {
                     setPathState(BasicStates.TO_ARTIFACT);
                 }
@@ -238,8 +279,16 @@ public class RedPatternAutoOp extends OpMode {
                 break;
 
 
+
+
             case FIRING:
                 //CURRENTLY UNIMPLEMENTED
+
+                double robDis = camera.getDist();
+                double outPower = (15 * Math.PI) * ((19.6 * Math.pow(robDis, 2))/((Math.sqrt(3) * robDis) - 15.75));
+                motorIN.setPower(-0.1);
+                motorTFER.setPower(0.26);
+                motorOUT.setPower(0.6);
 
                 if (pathTimer.getElapsedTime() >= LAUNCH_SECONDS)
                     setPathState(BasicStates.PARK);
@@ -248,6 +297,9 @@ public class RedPatternAutoOp extends OpMode {
 
 
             case PARK:
+                motorIN.setPower(0);
+                motorTFER.setPower(0);
+                motorOUT.setPower(0);
                 follower.followPath(toEndPath, true);
 
                 if (!follower.isBusy())
@@ -271,44 +323,5 @@ public class RedPatternAutoOp extends OpMode {
         pathTimer.resetTimer();
     }
 
-    @Override
-    public void init() {
-        //Timers
-        this.pathTimer = new Timer();
-        this.opmodeTimer = new Timer();
-        this.opmodeTimer.resetTimer();
 
-        //Hardware
-        this.motorOUT = new Motor(hardwareMap, "o");
-        this.motorIN = new Motor(hardwareMap, "i");
-        this.motorTFER = new Motor(hardwareMap,"t");
-
-        //Subsystems
-        this.launcher = new LauncherTwo(motorIN, motorTFER, motorOUT);
-
-        this.follower = Constants.createFollower(hardwareMap);
-        this.follower.setStartingPose(START_POSE);
-        this.camera = new CameraSetup(hardwareMap);
-    }
-
-    @Override
-    public void start()
-    {
-        opmodeTimer.resetTimer();
-        setPathState(BasicStates.INIT);
-    }
-
-    @Override
-    public void loop() {
-        follower.update();
-        camera.update();
-        autoFSM(); // need to constantly check the state machine status
-
-        // as the program is running, you can view the status of the robot for debugging
-        telemetry.addData("path state:", pathState);
-        telemetry.addData("x:", follower.getPose().getX());
-        telemetry.addData("y:", follower.getPose().getY());
-        telemetry.addData("heading:", follower.getPose().getHeading());
-        telemetry.update();
-    }
 }
