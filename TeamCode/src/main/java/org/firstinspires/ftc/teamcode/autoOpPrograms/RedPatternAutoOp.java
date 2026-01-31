@@ -45,7 +45,7 @@ public class RedPatternAutoOp extends OpMode {
     private final Pose BOT_ARTI_POSE = new Pose(100,36);
     private final Pose SCORING_POSE = new Pose(82,12);
     private final Pose SCANNING_POSE = new Pose(85,85);
-    private final Pose END_POSE = new Pose(100,100);
+    private final Pose END_POSE = new Pose(100,30);
     private final int COLLECTION_DISTANCE = 32;
 
     //Timer Constants
@@ -67,6 +67,7 @@ public class RedPatternAutoOp extends OpMode {
     private Follower follower;
     private CameraSetup camera;
     private Timer pathTimer, actionTimer, opmodeTimer;
+    public boolean preloaded;
     private BasicStates pathState;
     private int motifID;
 
@@ -124,8 +125,7 @@ public class RedPatternAutoOp extends OpMode {
                 }
 
                 boolean scanned = false;
-                //Set toArtifactPath to the proper artifact
-                // IDK the ids so these are all just placeholders rn
+                //Set toArtifactPath to the proper artifacts
                 switch(motifID)
                 {   //MOTIFS MATCH...
                     case 21: //TOP ARTIFACT PATTERN
@@ -227,7 +227,7 @@ public class RedPatternAutoOp extends OpMode {
                 follower.followPath(collectBallsPath, true);
 
                 if (!follower.isBusy())
-                    setPathState(BasicStates.COLLECTING);
+                    setPathState(BasicStates.TO_SCORING);
                 break;
 
             case TO_SCORING:
@@ -239,13 +239,22 @@ public class RedPatternAutoOp extends OpMode {
 
 
             case FIRING:
+                actionTimer.resetTimer();
                 //CURRENTLY UNIMPLEMENTED
-
-                if (pathTimer.getElapsedTime() >= LAUNCH_SECONDS)
-                    setPathState(BasicStates.PARK);
+                if (actionTimer.getElapsedTime() >= LAUNCH_SECONDS)
+                {
+                    if (preloaded) {
+                        setPathState(BasicStates.TO_MOTIF);
+                        preloaded = false;
+                    }
+                    else
+                    {
+                        generateEndPath();
+                        setPathState(BasicStates.PARK);
+                    }
+                }
 
                 break;
-
 
             case PARK:
                 follower.followPath(toEndPath, true);
@@ -256,11 +265,13 @@ public class RedPatternAutoOp extends OpMode {
 
 
             case IDLE:
+                //Used to wait for teleOp
                 break;
 
 
             default:
                 System.out.println("FSM System reached an undefined state");
+                follower.followPath(toEndPath, true);
                 break;
         }
     }
@@ -295,7 +306,11 @@ public class RedPatternAutoOp extends OpMode {
     public void start()
     {
         opmodeTimer.resetTimer();
+        actionTimer.resetTimer();
+        pathTimer.resetTimer();
         setPathState(BasicStates.INIT);
+
+        preloaded = true;
     }
 
     @Override
@@ -310,5 +325,19 @@ public class RedPatternAutoOp extends OpMode {
         telemetry.addData("y:", follower.getPose().getY());
         telemetry.addData("heading:", follower.getPose().getHeading());
         telemetry.update();
+    }
+
+    /**
+     * Generates a path from the robot's current position to its final pose
+     */
+    private void generateEndPath()
+    {
+        toEndPath = new Path(
+                new BezierLine(
+                        follower.getPose(),
+                        END_POSE
+                )
+        );
+        toEndPath.setLinearHeadingInterpolation(follower.getHeading(), END_ANGLE);
     }
 }
