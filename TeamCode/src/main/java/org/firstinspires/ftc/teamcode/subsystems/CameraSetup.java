@@ -36,6 +36,9 @@ public class CameraSetup {
 
     private boolean hasTag = false;
 
+    private int lostFrames = 0;
+    private int maxLost = 5;
+
 
 
     public CameraSetup(HardwareMap hardwaremap){
@@ -83,6 +86,10 @@ public class CameraSetup {
 
     public int getTag(){
         return tagID;
+    }
+
+    public boolean hasGoalTagSet(){
+        return tagID == TAG_BLUE || tagID == TAG_RED;
     }
 
     public void stop(){

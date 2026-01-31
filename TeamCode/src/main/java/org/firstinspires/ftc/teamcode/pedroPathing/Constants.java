@@ -24,18 +24,18 @@ public class Constants {
     public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1, 1);
 
     public static TwoWheelConstants localizerConstants = new TwoWheelConstants()
-            .forwardEncoder_HardwareMapName("odoY")
-            .strafeEncoder_HardwareMapName("odoX")
+            .forwardEncoder_HardwareMapName("fl")
+            .strafeEncoder_HardwareMapName("fr")
             .forwardEncoderDirection(Encoder.FORWARD)
             .strafeEncoderDirection(Encoder.FORWARD)
-            .forwardTicksToInches(0.0005053) //Calculate and calibrate this to fit odopods
-            .strafeTicksToInches(0.0005053)
+            .forwardTicksToInches(0.0005025 * 3.96) //Calculate and calibrate this to fit odopods
+            .strafeTicksToInches(0.0005025 * 3.96)
             .strafePodX(4.5)//Measure and calculate offset from center
             .IMU_HardwareMapName("imu")
             .IMU_Orientation(
                     new RevHubOrientationOnRobot(
-                            RevHubOrientationOnRobot.LogoFacingDirection.UP,
-                            RevHubOrientationOnRobot.UsbFacingDirection.LEFT
+                            RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
+                            RevHubOrientationOnRobot.UsbFacingDirection.FORWARD
                     )
             );
 
@@ -58,10 +58,10 @@ public class Constants {
 */
     public static MecanumConstants driveConstants = new MecanumConstants()
             .maxPower(1)
-            .rightFrontMotorName("rf")
-            .rightRearMotorName("rr")
-            .leftRearMotorName("lr")
-            .leftFrontMotorName("lf")
+            .rightFrontMotorName("fr")
+            .rightRearMotorName("br")
+            .leftRearMotorName("bl")
+            .leftFrontMotorName("fl")
             .leftFrontMotorDirection(DcMotorSimple.Direction.REVERSE)
             .leftRearMotorDirection(DcMotorSimple.Direction.REVERSE)
             .rightFrontMotorDirection(DcMotorSimple.Direction.FORWARD)

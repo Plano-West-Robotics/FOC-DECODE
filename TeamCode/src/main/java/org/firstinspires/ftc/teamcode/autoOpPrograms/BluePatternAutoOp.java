@@ -96,24 +96,24 @@ public class BluePatternAutoOp extends OpMode {
                         SCANNING_POSE
                 )
         );
-        toScanPath.setLinearHeadingInterpolation(LAUNCH_ANGLE, SCAN_ANGLE);
+        toScanPath.setLinearHeadingInterpolation(START_ANGLE, SCAN_ANGLE);
 
     }
 
     public void autoFSM() {
-        if (opmodeTimer.getElapsedTimeSeconds() >= ROUND_SECONDS)
+        if (opmodeTimer.getElapsedTimeSeconds() >= ROUND_SECONDS && pathState != BluePatternAutoOp.BasicStates.PARK && pathState != BluePatternAutoOp.BasicStates.IDLE)
         {
             motorIN.setPower(0);
             motorTFER.setPower(0);
             motorOUT.setPower(0);
-
+            generateEndPath();
             setPathState(BasicStates.PARK);
         }
 
         switch (pathState) {
             case INIT:
                 if (opmodeTimer.getElapsedTime() >= INIT_SECONDS)
-                    setPathState(BasicStates.TO_SCORING);
+                    setPathState(BasicStates.TO_MOTIF);
                 break;
 
             case TO_MOTIF:
@@ -124,13 +124,16 @@ public class BluePatternAutoOp extends OpMode {
                 break;
 
             case SCANNING_MOTIF:
-                camera.update();
+
+                if(pathTimer.getElapsedTime() < 0.4){
+                    break;
+                }
                 //Do stuff with camera to set motifID to the correct id.
                 if (camera.hasTagCheck()){
                     motifID = camera.getTag();
                 }
-
                 boolean scanned = false;
+
                 //Set toArtifactPath to the proper artifacts
                 switch(motifID)
                 {   //MOTIFS MATCH...
@@ -149,7 +152,7 @@ public class BluePatternAutoOp extends OpMode {
                                         new Pose(TOP_ARTI_POSE.getX() - COLLECTION_DISTANCE, TOP_ARTI_POSE.getY())
                                 )
                         );
-                        toArtifactPath.setLinearHeadingInterpolation(COLLECTION_ANGLE, COLLECTION_ANGLE);
+                        collectBallsPath.setLinearHeadingInterpolation(COLLECTION_ANGLE, COLLECTION_ANGLE);
                         scanned = true;
                         break;
 
@@ -168,7 +171,7 @@ public class BluePatternAutoOp extends OpMode {
                                         new Pose(MID_ARTI_POSE.getX() - COLLECTION_DISTANCE, MID_ARTI_POSE.getY())
                                 )
                         );
-                        toArtifactPath.setLinearHeadingInterpolation(COLLECTION_ANGLE, COLLECTION_ANGLE);
+                        collectBallsPath.setLinearHeadingInterpolation(COLLECTION_ANGLE, COLLECTION_ANGLE);
                         scanned = true;
                         break;
 
@@ -187,7 +190,7 @@ public class BluePatternAutoOp extends OpMode {
                                         new Pose(BOT_ARTI_POSE.getX() - COLLECTION_DISTANCE, BOT_ARTI_POSE.getY())
                                 )
                         );
-                        toArtifactPath.setLinearHeadingInterpolation(COLLECTION_ANGLE, COLLECTION_ANGLE);
+                        collectBallsPath.setLinearHeadingInterpolation(COLLECTION_ANGLE, COLLECTION_ANGLE);
                         scanned = true;
                         break;
 
@@ -206,13 +209,13 @@ public class BluePatternAutoOp extends OpMode {
                                         new Pose(BOT_ARTI_POSE.getX() - COLLECTION_DISTANCE, BOT_ARTI_POSE.getY())
                                 )
                         );
-                        toArtifactPath.setLinearHeadingInterpolation(COLLECTION_ANGLE, COLLECTION_ANGLE);
+                        collectBallsPath.setLinearHeadingInterpolation(COLLECTION_ANGLE, COLLECTION_ANGLE);
                         scanned = true;
                         break;
                 }
 
                 //Dont forget to wait until it finishes scanning
-                if (scanned /*PLACEHOLDER*/ )
+                if (scanned)
                 {
                     setPathState(BasicStates.TO_ARTIFACT);
                 }
@@ -230,6 +233,8 @@ public class BluePatternAutoOp extends OpMode {
                 break;
 
             case COLLECTING:
+                motorIN.setPower(-0.1);
+                motorTFER.setPower(0.26);
                 follower.followPath(collectBallsPath, true);
 
                 if (!follower.isBusy())
@@ -237,6 +242,8 @@ public class BluePatternAutoOp extends OpMode {
                 break;
 
             case TO_SCORING:
+                motorIN.setPower(0);
+                motorOUT.setPower(0);
                 follower.followPath(toScorePath, true);
 
                 if (!follower.isBusy())
@@ -245,10 +252,23 @@ public class BluePatternAutoOp extends OpMode {
 
 
             case FIRING:
-                actionTimer.resetTimer();
+                if(!camera.hasGoalTagSet()){
+                    actionTimer.resetTimer();
+                    motorIN.setPower(0);
+                    motorTFER.setPower(0);
+                    motorOUT.setPower(0);
+                    break;
+                }
 
                 double robDis = camera.getDist();
+                if(robDis < 10 || robDis > 80){
+                    motorIN.setPower(0);
+                    motorTFER.setPower(0);
+                    motorOUT.setPower(0);
+                    break;
+                }
                 double outPower = (15 * Math.PI) * ((19.6 * Math.pow(robDis, 2))/((Math.sqrt(3) * robDis) - 15.75));
+                outPower = Math.max(0.0, Math.min(outPower, 1));
                 motorIN.setPower(-0.1);
                 motorTFER.setPower(0.26);
                 motorOUT.setPower(outPower);
@@ -300,6 +320,10 @@ public class BluePatternAutoOp extends OpMode {
     {
         pathState = state;
         pathTimer.resetTimer();
+
+        if(state == BasicStates.FIRING){
+            actionTimer.resetTimer();
+        }
     }
 
     @Override
@@ -307,6 +331,7 @@ public class BluePatternAutoOp extends OpMode {
         //Timers
         this.pathTimer = new Timer();
         this.opmodeTimer = new Timer();
+        this.actionTimer = new Timer();
         this.opmodeTimer.resetTimer();
 
         //Hardware
@@ -319,6 +344,7 @@ public class BluePatternAutoOp extends OpMode {
 
         this.follower = Constants.createFollower(hardwareMap);
         this.follower.setStartingPose(START_POSE);
+        buildPaths();
         this.camera = new CameraSetup(hardwareMap);
     }
 
