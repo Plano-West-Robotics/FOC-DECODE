@@ -251,7 +251,7 @@ public class RedPatternAutoOp extends OpMode {
                 double outPower = (15 * Math.PI) * ((19.6 * Math.pow(robDis, 2))/((Math.sqrt(3) * robDis) - 15.75));
                 motorIN.setPower(-0.1);
                 motorTFER.setPower(0.26);
-                motorOUT.setPower(0.6);
+                motorOUT.setPower(outPower);
 
                 if (actionTimer.getElapsedTime() >= LAUNCH_SECONDS)
                 {
