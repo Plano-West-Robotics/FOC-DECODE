@@ -1,22 +1,22 @@
 package org.firstinspires.ftc.teamcode.autoOpPrograms;
 
 import com.pedropathing.follower.Follower;
-import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.Path;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.hardware.CRServo;
 
 import org.firstinspires.ftc.teamcode.hardware.Motor;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.CameraSetup;
 import org.firstinspires.ftc.teamcode.subsystems.LauncherTwo;
 
-@Autonomous(name = "Red AutoOp with Bottom Start", group = "Autonomous")
-public class RedPatternAutoOp extends OpMode {
+import java.util.Scanner;
+
+@Autonomous(name = "Red AutoOp with Top Start", group = "Autonomous")
+public class RedPatternAutoOpUpper extends OpMode {
 
     //State Enum
     public enum BasicStates
@@ -33,13 +33,13 @@ public class RedPatternAutoOp extends OpMode {
     }
 
     //Pose & Angle Constants
-    private final double START_ANGLE = Math.toRadians(90);
+    private final double START_ANGLE = Math.toRadians(216);
     private final double COLLECTION_ANGLE = Math.toRadians(180);
     private final double LAUNCH_ANGLE = Math.toRadians(63.5);
     private final double SCAN_ANGLE = Math.toRadians(90);
     private final double END_ANGLE = Math.toRadians(90);
 
-    private final Pose START_POSE = new Pose(88, 8);
+    private final Pose START_POSE = new Pose(123, 123);
     private final Pose TOP_ARTI_POSE = new Pose(100,84);
     private final Pose MID_ARTI_POSE = new Pose(100,60);
     private final Pose BOT_ARTI_POSE = new Pose(100,36);
@@ -84,19 +84,19 @@ public class RedPatternAutoOp extends OpMode {
     {
         toScorePath = new Path(
                 new BezierLine(
-                        START_POSE,
+                        SCANNING_POSE,
                         SCORING_POSE
                 )
         );
-        toScorePath.setLinearHeadingInterpolation(START_ANGLE, LAUNCH_ANGLE);
+        toScorePath.setLinearHeadingInterpolation(SCAN_ANGLE, LAUNCH_ANGLE);
 
         toScanPath = new Path(
                 new BezierLine(
-                        SCORING_POSE,
+                        START_POSE,
                         SCANNING_POSE
                 )
         );
-        toScanPath.setLinearHeadingInterpolation(LAUNCH_ANGLE, SCAN_ANGLE);
+        toScanPath.setLinearHeadingInterpolation(START_ANGLE, SCAN_ANGLE);
 
     }
 
@@ -113,7 +113,7 @@ public class RedPatternAutoOp extends OpMode {
         switch (pathState) {
             case INIT:
                 if (opmodeTimer.getElapsedTime() >= INIT_SECONDS)
-                    setPathState(BasicStates.TO_SCORING);
+                    setPathState(BasicStates.TO_MOTIF);
                 break;
 
             case TO_MOTIF:
@@ -124,7 +124,6 @@ public class RedPatternAutoOp extends OpMode {
                 break;
 
             case SCANNING_MOTIF:
-
                 if(pathTimer.getElapsedTime() < 0.4){
                     break;
                 }
@@ -140,11 +139,11 @@ public class RedPatternAutoOp extends OpMode {
                     case 21: //TOP ARTIFACT PATTERN
                         toArtifactPath = new Path(
                                 new BezierLine(
-                                        follower.getPose(),
+                                        SCORING_POSE,
                                         TOP_ARTI_POSE
                                 )
                         );
-                        toArtifactPath.setLinearHeadingInterpolation(follower.getHeading(),COLLECTION_ANGLE);
+                        toArtifactPath.setLinearHeadingInterpolation(LAUNCH_ANGLE, COLLECTION_ANGLE);
 
                         collectBallsPath = new Path(
                                 new BezierLine(
@@ -159,11 +158,11 @@ public class RedPatternAutoOp extends OpMode {
                     case 22: //MIDDLE ARTIFACT PATTERN
                         toArtifactPath = new Path(
                                 new BezierLine(
-                                        follower.getPose(),
+                                        SCORING_POSE,
                                         MID_ARTI_POSE
                                 )
                         );
-                        toArtifactPath.setLinearHeadingInterpolation(follower.getHeading(),COLLECTION_ANGLE);
+                        toArtifactPath.setLinearHeadingInterpolation(LAUNCH_ANGLE,COLLECTION_ANGLE);
 
                         collectBallsPath = new Path(
                                 new BezierLine(
@@ -178,11 +177,11 @@ public class RedPatternAutoOp extends OpMode {
                     case 23: //BOTTOM ARTIFACT PATTERN
                         toArtifactPath = new Path(
                                 new BezierLine(
-                                        follower.getPose(),
+                                        SCORING_POSE,
                                         BOT_ARTI_POSE
                                         )
                         );
-                        toArtifactPath.setLinearHeadingInterpolation(follower.getHeading(),COLLECTION_ANGLE);
+                        toArtifactPath.setLinearHeadingInterpolation(LAUNCH_ANGLE,COLLECTION_ANGLE);
 
                         collectBallsPath = new Path(
                                 new BezierLine(
@@ -217,7 +216,7 @@ public class RedPatternAutoOp extends OpMode {
                 //Dont forget to wait until it finishes scanning
                 if (scanned)
                 {
-                    setPathState(BasicStates.TO_ARTIFACT);
+                    setPathState(BasicStates.TO_SCORING);
                 }
 
                 break;
@@ -280,7 +279,7 @@ public class RedPatternAutoOp extends OpMode {
                     motorOUT.setPower(0);
 
                     if (preloaded) {
-                        setPathState(BasicStates.TO_MOTIF);
+                        setPathState(BasicStates.TO_ARTIFACT);
                         preloaded = false;
                     }
                     else
