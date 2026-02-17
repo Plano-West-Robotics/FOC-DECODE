@@ -1,22 +1,22 @@
 package org.firstinspires.ftc.teamcode.autoOpPrograms;
 
 import com.pedropathing.follower.Follower;
-import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.Path;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.hardware.CRServo;
 
 import org.firstinspires.ftc.teamcode.hardware.Motor;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.CameraSetup;
 import org.firstinspires.ftc.teamcode.subsystems.LauncherTwo;
 
-@Autonomous(name = "Blue AutoOp with Bottom Start", group = "Autonomous")
-public class BluePatternAutoOp extends OpMode {
+import java.util.Scanner;
+
+@Autonomous(name = "Red AutoOp with Top Start", group = "Autonomous")
+public class RedPatternAutoOpUpper extends OpMode {
 
     //State Enum
     public enum BasicStates
@@ -33,19 +33,19 @@ public class BluePatternAutoOp extends OpMode {
     }
 
     //Pose & Angle Constants
-    private final double START_ANGLE = Math.toRadians(90);
-    private final double COLLECTION_ANGLE = Math.toRadians(0);
-    private final double LAUNCH_ANGLE = Math.toRadians(116.5);
+    private final double START_ANGLE = Math.toRadians(216);
+    private final double COLLECTION_ANGLE = Math.toRadians(180);
+    private final double LAUNCH_ANGLE = Math.toRadians(63.5);
     private final double SCAN_ANGLE = Math.toRadians(90);
     private final double END_ANGLE = Math.toRadians(90);
 
-    private final Pose START_POSE = new Pose(56, 8);
-    private final Pose TOP_ARTI_POSE = new Pose(44,84);
-    private final Pose MID_ARTI_POSE = new Pose(44,60);
-    private final Pose BOT_ARTI_POSE = new Pose(44,36);
-    private final Pose SCORING_POSE = new Pose(62,12);
-    private final Pose SCANNING_POSE = new Pose(59,85);
-    private final Pose END_POSE = new Pose(44,30);
+    private final Pose START_POSE = new Pose(123, 123);
+    private final Pose TOP_ARTI_POSE = new Pose(100,84);
+    private final Pose MID_ARTI_POSE = new Pose(100,60);
+    private final Pose BOT_ARTI_POSE = new Pose(100,36);
+    private final Pose SCORING_POSE = new Pose(82,12);
+    private final Pose SCANNING_POSE = new Pose(85,85);
+    private final Pose END_POSE = new Pose(100,30);
     private final int COLLECTION_DISTANCE = 32;
 
     //Timer Constants
@@ -84,24 +84,24 @@ public class BluePatternAutoOp extends OpMode {
     {
         toScorePath = new Path(
                 new BezierLine(
-                        START_POSE,
+                        SCANNING_POSE,
                         SCORING_POSE
                 )
         );
-        toScorePath.setLinearHeadingInterpolation(START_ANGLE, LAUNCH_ANGLE);
+        toScorePath.setLinearHeadingInterpolation(SCAN_ANGLE, LAUNCH_ANGLE);
 
         toScanPath = new Path(
                 new BezierLine(
-                        SCORING_POSE,
+                        START_POSE,
                         SCANNING_POSE
                 )
         );
-        toScanPath.setLinearHeadingInterpolation(LAUNCH_ANGLE, SCAN_ANGLE);
+        toScanPath.setLinearHeadingInterpolation(START_ANGLE, SCAN_ANGLE);
 
     }
 
     public void autoFSM() {
-        if (opmodeTimer.getElapsedTimeSeconds() >= ROUND_SECONDS && pathState != BluePatternAutoOp.BasicStates.PARK && pathState != BluePatternAutoOp.BasicStates.IDLE)
+        if (opmodeTimer.getElapsedTimeSeconds() >= ROUND_SECONDS && pathState != BasicStates.PARK && pathState != BasicStates.IDLE)
         {
             motorIN.setPower(0);
             motorTFER.setPower(0);
@@ -124,7 +124,6 @@ public class BluePatternAutoOp extends OpMode {
                 break;
 
             case SCANNING_MOTIF:
-
                 if(pathTimer.getElapsedTime() < 0.4){
                     break;
                 }
@@ -132,24 +131,24 @@ public class BluePatternAutoOp extends OpMode {
                 if (camera.hasTagCheck()){
                     motifID = camera.getTag();
                 }
-                boolean scanned = false;
 
+                boolean scanned = false;
                 //Set toArtifactPath to the proper artifacts
                 switch(motifID)
                 {   //MOTIFS MATCH...
                     case 21: //TOP ARTIFACT PATTERN
                         toArtifactPath = new Path(
                                 new BezierLine(
-                                        follower.getPose(),
+                                        SCORING_POSE,
                                         TOP_ARTI_POSE
                                 )
                         );
-                        toArtifactPath.setLinearHeadingInterpolation(follower.getHeading(),COLLECTION_ANGLE);
+                        toArtifactPath.setLinearHeadingInterpolation(LAUNCH_ANGLE, COLLECTION_ANGLE);
 
                         collectBallsPath = new Path(
                                 new BezierLine(
                                         TOP_ARTI_POSE,
-                                        new Pose(TOP_ARTI_POSE.getX() - COLLECTION_DISTANCE, TOP_ARTI_POSE.getY())
+                                        new Pose(TOP_ARTI_POSE.getX() + COLLECTION_DISTANCE, TOP_ARTI_POSE.getY())
                                 )
                         );
                         collectBallsPath.setLinearHeadingInterpolation(COLLECTION_ANGLE, COLLECTION_ANGLE);
@@ -159,16 +158,16 @@ public class BluePatternAutoOp extends OpMode {
                     case 22: //MIDDLE ARTIFACT PATTERN
                         toArtifactPath = new Path(
                                 new BezierLine(
-                                        follower.getPose(),
+                                        SCORING_POSE,
                                         MID_ARTI_POSE
                                 )
                         );
-                        toArtifactPath.setLinearHeadingInterpolation(follower.getHeading(),COLLECTION_ANGLE);
+                        toArtifactPath.setLinearHeadingInterpolation(LAUNCH_ANGLE,COLLECTION_ANGLE);
 
                         collectBallsPath = new Path(
                                 new BezierLine(
                                         MID_ARTI_POSE,
-                                        new Pose(MID_ARTI_POSE.getX() - COLLECTION_DISTANCE, MID_ARTI_POSE.getY())
+                                        new Pose(MID_ARTI_POSE.getX() + COLLECTION_DISTANCE, MID_ARTI_POSE.getY())
                                 )
                         );
                         collectBallsPath.setLinearHeadingInterpolation(COLLECTION_ANGLE, COLLECTION_ANGLE);
@@ -178,16 +177,16 @@ public class BluePatternAutoOp extends OpMode {
                     case 23: //BOTTOM ARTIFACT PATTERN
                         toArtifactPath = new Path(
                                 new BezierLine(
-                                        follower.getPose(),
+                                        SCORING_POSE,
                                         BOT_ARTI_POSE
-                                )
+                                        )
                         );
-                        toArtifactPath.setLinearHeadingInterpolation(follower.getHeading(),COLLECTION_ANGLE);
+                        toArtifactPath.setLinearHeadingInterpolation(LAUNCH_ANGLE,COLLECTION_ANGLE);
 
                         collectBallsPath = new Path(
                                 new BezierLine(
                                         BOT_ARTI_POSE,
-                                        new Pose(BOT_ARTI_POSE.getX() - COLLECTION_DISTANCE, BOT_ARTI_POSE.getY())
+                                        new Pose(BOT_ARTI_POSE.getX() + COLLECTION_DISTANCE, BOT_ARTI_POSE.getY())
                                 )
                         );
                         collectBallsPath.setLinearHeadingInterpolation(COLLECTION_ANGLE, COLLECTION_ANGLE);
@@ -201,12 +200,12 @@ public class BluePatternAutoOp extends OpMode {
                                         BOT_ARTI_POSE
                                 )
                         );
-                        toArtifactPath.setLinearHeadingInterpolation(follower.getHeading(),COLLECTION_ANGLE);
+                        toArtifactPath.setLinearHeadingInterpolation(follower.getHeading(), COLLECTION_ANGLE);
 
                         collectBallsPath = new Path(
                                 new BezierLine(
                                         BOT_ARTI_POSE,
-                                        new Pose(BOT_ARTI_POSE.getX() - COLLECTION_DISTANCE, BOT_ARTI_POSE.getY())
+                                        new Pose(BOT_ARTI_POSE.getX() + COLLECTION_DISTANCE, BOT_ARTI_POSE.getY())
                                 )
                         );
                         collectBallsPath.setLinearHeadingInterpolation(COLLECTION_ANGLE, COLLECTION_ANGLE);
@@ -217,7 +216,7 @@ public class BluePatternAutoOp extends OpMode {
                 //Dont forget to wait until it finishes scanning
                 if (scanned)
                 {
-                    setPathState(BasicStates.TO_ARTIFACT);
+                    setPathState(BasicStates.TO_SCORING);
                 }
 
                 break;
@@ -259,7 +258,6 @@ public class BluePatternAutoOp extends OpMode {
                     motorOUT.setPower(0);
                     break;
                 }
-
                 double robDis = camera.getDist();
                 if(robDis < 10 || robDis > 80){
                     motorIN.setPower(0);
@@ -281,7 +279,7 @@ public class BluePatternAutoOp extends OpMode {
                     motorOUT.setPower(0);
 
                     if (preloaded) {
-                        setPathState(BasicStates.TO_MOTIF);
+                        setPathState(BasicStates.TO_ARTIFACT);
                         preloaded = false;
                     }
                     else
@@ -321,7 +319,7 @@ public class BluePatternAutoOp extends OpMode {
         pathState = state;
         pathTimer.resetTimer();
 
-        if(state == BasicStates.FIRING){
+        if (state == BasicStates.FIRING){
             actionTimer.resetTimer();
         }
     }

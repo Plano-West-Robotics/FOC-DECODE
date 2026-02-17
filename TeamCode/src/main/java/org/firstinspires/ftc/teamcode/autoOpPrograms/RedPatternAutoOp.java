@@ -92,11 +92,11 @@ public class RedPatternAutoOp extends OpMode {
 
         toScanPath = new Path(
                 new BezierLine(
-                        START_POSE,
+                        SCORING_POSE,
                         SCANNING_POSE
                 )
         );
-        toScanPath.setLinearHeadingInterpolation(START_ANGLE, SCAN_ANGLE);
+        toScanPath.setLinearHeadingInterpolation(LAUNCH_ANGLE, SCAN_ANGLE);
 
     }
 
@@ -113,7 +113,7 @@ public class RedPatternAutoOp extends OpMode {
         switch (pathState) {
             case INIT:
                 if (opmodeTimer.getElapsedTime() >= INIT_SECONDS)
-                    setPathState(BasicStates.TO_MOTIF);
+                    setPathState(BasicStates.TO_SCORING);
                 break;
 
             case TO_MOTIF:
@@ -124,7 +124,6 @@ public class RedPatternAutoOp extends OpMode {
                 break;
 
             case SCANNING_MOTIF:
-
 
                 if(pathTimer.getElapsedTime() < 0.4){
                     break;
@@ -202,7 +201,7 @@ public class RedPatternAutoOp extends OpMode {
                                         BOT_ARTI_POSE
                                 )
                         );
-                        toArtifactPath.setLinearHeadingInterpolation(follower.getHeading(),COLLECTION_ANGLE);
+                        toArtifactPath.setLinearHeadingInterpolation(follower.getHeading(), COLLECTION_ANGLE);
 
                         collectBallsPath = new Path(
                                 new BezierLine(
