@@ -34,7 +34,10 @@ public class CameraSetup {
     private double yOff = 0;
     private double dist = 0;
 
+    private double yaw; //THIS IS FOR LOCKING WHEN SCORING
+
     private boolean hasTag = false;
+
 
     private int lostFrames = 0;
     private int maxLost = 5;
@@ -52,16 +55,29 @@ public class CameraSetup {
     public void update(){
         List<AprilTagDetection> detections = atp.getDetections();
 
-        hasTag = false;
+        boolean alreadyFrame = false;
 
         for (AprilTagDetection tag: detections){
+            if (tag.ftcPose == null){
+                continue;
+            }
             if(tag.id == TAG_BLUE || tag.id == TAG_RED || tag.id == TAG_21 || tag.id == TAG_22 ||tag.id == TAG_23 ){
                 xOff = tag.ftcPose.x;
                 yOff = tag.ftcPose.y;
                 dist = tag.ftcPose.range;
+                yaw = tag.ftcPose.yaw;
                 tagID = tag.id;
+
                 hasTag = true;
-                return;
+                lostFrames = 0;
+                alreadyFrame = true;
+                break;
+            }
+        }
+        if(!alreadyFrame){
+            lostFrames++;
+            if (lostFrames > maxLost){
+                hasTag = false;
             }
         }
 
@@ -90,6 +106,10 @@ public class CameraSetup {
 
     public boolean hasGoalTagSet(){
         return tagID == TAG_BLUE || tagID == TAG_RED;
+    }
+
+    public double getYaw(){
+        return yaw;
     }
 
     public void stop(){

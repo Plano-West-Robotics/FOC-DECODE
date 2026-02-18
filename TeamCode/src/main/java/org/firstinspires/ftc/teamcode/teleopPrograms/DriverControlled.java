@@ -69,24 +69,29 @@ public class DriverControlled extends OpMode {
     public void loop(){
 
         //forward backward turning
-        fl.setPower(gamepad1.left_stick_y);
-        fr.setPower(gamepad1.right_stick_y);
-        bl.setPower(gamepad1.left_stick_y);
-        br.setPower(gamepad1.right_stick_y);
+        //fl.setPower(-gamepad1.left_stick_y);
+        //fr.setPower(-gamepad1.right_stick_y);
+        //bl.setPower(-gamepad1.left_stick_y);
+        //br.setPower(-gamepad1.right_stick_y);
+
+        fl.setPower(-gamepad1.right_stick_y);
+        fr.setPower(-gamepad1.left_stick_y);
+        bl.setPower(-gamepad1.right_stick_y);
+        br.setPower(-gamepad1.left_stick_y);
 
         if(gamepad1.left_trigger > 0 ){
             double leftStrafe = gamepad1.left_trigger;
-            fl.setPower(leftStrafe);
-            fr.setPower(-leftStrafe);
-            bl.setPower(-leftStrafe);
-            br.setPower(leftStrafe);
+            fl.setPower(-leftStrafe);
+            fr.setPower(leftStrafe);
+            bl.setPower(leftStrafe);
+            br.setPower(-leftStrafe);
         }
         if(gamepad1.right_trigger > 0 ){
             double rightStrafe = gamepad1.right_trigger;
-            fl.setPower(-rightStrafe);
-            fr.setPower(rightStrafe);
-            bl.setPower(rightStrafe);
-            br.setPower(-rightStrafe);
+            fl.setPower(rightStrafe);
+            fr.setPower(-rightStrafe);
+            bl.setPower(-rightStrafe);
+            br.setPower(rightStrafe);
         }
         /*if(gamepad2.right_trigger > 0)
         {
