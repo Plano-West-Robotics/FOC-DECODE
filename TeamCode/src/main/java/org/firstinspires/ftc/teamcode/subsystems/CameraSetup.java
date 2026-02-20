@@ -9,6 +9,7 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
+import org.openftc.apriltag.ApriltagDetectionJNI;
 
 import java.util.List;
 
@@ -39,12 +40,12 @@ public class CameraSetup {
     private boolean hasTag = false;
 
 
+
     private int lostFrames = 0;
     private int maxLost = 5;
 
 
-
-    public CameraSetup(HardwareMap hardwaremap){
+    public CameraSetup(HardwareMap hardwaremap) {
 
         atp = new AprilTagProcessor.Builder().setLensIntrinsics(FX, FY, CX, CY).setDrawAxes(false).setDrawCubeProjection(false).setDrawTagOutline(false).build();
 
@@ -52,16 +53,16 @@ public class CameraSetup {
 
     }
 
-    public void update(){
+    public void update() {
         List<AprilTagDetection> detections = atp.getDetections();
 
         boolean alreadyFrame = false;
 
-        for (AprilTagDetection tag: detections){
-            if (tag.ftcPose == null){
+        for (AprilTagDetection tag : detections) {
+            if (tag.ftcPose == null) {
                 continue;
             }
-            if(tag.id == TAG_BLUE || tag.id == TAG_RED || tag.id == TAG_21 || tag.id == TAG_22 ||tag.id == TAG_23 ){
+            if (tag.id == TAG_BLUE || tag.id == TAG_RED || tag.id == TAG_21 || tag.id == TAG_22 || tag.id == TAG_23) {
                 xOff = tag.ftcPose.x;
                 yOff = tag.ftcPose.y;
                 dist = tag.ftcPose.range;
@@ -74,15 +75,16 @@ public class CameraSetup {
                 break;
             }
         }
-        if(!alreadyFrame){
+        if (!alreadyFrame) {
             lostFrames++;
-            if (lostFrames > maxLost){
+            if (lostFrames > maxLost) {
                 hasTag = false;
             }
         }
 
 
     }
+
 
     public boolean hasTagCheck(){
         return hasTag;
@@ -108,9 +110,36 @@ public class CameraSetup {
         return tagID == TAG_BLUE || tagID == TAG_RED;
     }
 
+    public AprilTagDetection getGoalTag(){
+        if(!hasGoalTagSet()){
+            return null;
+        }
+        List<AprilTagDetection> detections = atp.getDetections();
+        if(detections == null || detections.isEmpty()){
+            return null;
+        }
+        for (AprilTagDetection d: detections){
+           if(d.id == tagID){
+               return d;
+           }
+        }
+        return null;
+    }
+
     public double getYaw(){
         return yaw;
     }
+
+    public void setAlliance(boolean isRed){ //in init();
+        if(isRed){
+            tagID = TAG_RED;
+        }
+        else{
+            tagID = TAG_BLUE;
+        }
+    }
+
+
 
     public void stop(){
         visPort.close();
