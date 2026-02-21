@@ -132,11 +132,6 @@ public class Gear {
 
 
 
-
-
-
-
-
     public void setAlliance(boolean isRed){ //in init();
         if(isRed){
             switchDir = 1;
