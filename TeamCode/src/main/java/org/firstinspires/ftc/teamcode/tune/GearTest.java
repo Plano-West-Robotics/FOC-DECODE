@@ -91,6 +91,7 @@ public class GearTest extends OpMode {
         if (gp1.b && !prevgp1.b)
             gear.finishTrack();
 
+        camera.update();
         gear.update();
     }
 }

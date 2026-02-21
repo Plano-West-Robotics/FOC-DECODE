@@ -247,41 +247,28 @@ public class BluePatternAutoOpUpper extends OpMode {
 
             case TO_SCORING:
                 motorIN.setPower(0);
-                motorOUT.setPower(0);
                 follower.followPath(toScorePath, true);
 
                 if (!follower.isBusy())
+                {
+                    actionTimer.resetTimer();
                     setPathState(BasicStates.FIRING);
+                }
                 break;
 
 
             case FIRING:
-                if(!camera.hasGoalTagSet()){
-                    actionTimer.resetTimer();
-                    motorIN.setPower(0);
-                    motorTFER.setPower(0);
-                    motorOUT.setPower(0);
-                    break;
-                }
-                double robDis = camera.getDist();
-                if(robDis < 10 || robDis > 80){
-                    motorIN.setPower(0);
-                    motorTFER.setPower(0);
-                    motorOUT.setPower(0);
-                    break;
-                }
-                double outPower = (15 * Math.PI) * ((19.6 * Math.pow(robDis, 2))/((Math.sqrt(3) * robDis) - 15.75));
-                outPower = Math.max(0.0, Math.min(outPower, 1));
-                motorIN.setPower(-0.1);
-                motorTFER.setPower(0.26);
-                motorOUT.setPower(outPower);
+
+                /*
+                 * FLICK BALL INTO TURRET
+                 * SHIFT OTHER BALLS INTO NEW POS
+                 */
 
                 if (actionTimer.getElapsedTime() >= LAUNCH_SECONDS)
                 {
 
                     motorIN.setPower(0);
                     motorTFER.setPower(0);
-                    motorOUT.setPower(0);
 
                     if (preloaded) {
                         setPathState(BasicStates.TO_ARTIFACT);
@@ -369,6 +356,7 @@ public class BluePatternAutoOpUpper extends OpMode {
     public void loop() {
         follower.update();
         camera.update();
+        gear.update();
         autoFSM(); // need to constantly check the state machine status
 
         // as the program is running, you can view the status of the robot for debugging
