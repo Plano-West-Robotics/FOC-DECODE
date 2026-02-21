@@ -32,17 +32,21 @@ public class BluePatternAutoOpUpper extends OpMode {
     }
 
     //Pose & Angle Constants
-    private final double START_ANGLE = Math.toRadians(144);
+    private final double TOP_START_ANGLE = Math.toRadians(144);
+    private final double BOT_START_ANGLE = Math.toRadians(90);
     private final double COLLECTION_ANGLE = Math.toRadians(0);
-    private final double LAUNCH_ANGLE = Math.toRadians(116.5);
+    private final double TOP_LAUNCH_ANGLE = Math.toRadians(134);
+    private final double BOT_LAUNCH_ANGLE = Math.toRadians(112);
     private final double SCAN_ANGLE = Math.toRadians(90);
     private final double END_ANGLE = Math.toRadians(90);
 
-    private final Pose START_POSE = new Pose(21, 123);
+    private final Pose TOP_START_POSE = new Pose(21, 123);
+    private final Pose BOT_START_POSE = new Pose(56, 8);
     private final Pose TOP_ARTI_POSE = new Pose(44,84);
     private final Pose MID_ARTI_POSE = new Pose(44,60);
     private final Pose BOT_ARTI_POSE = new Pose(44,36);
-    private final Pose SCORING_POSE = new Pose(62,12);
+    private final Pose TOP_SCORING_POSE = new Pose(59,85);
+    private final Pose BOT_SCORING_POSE = new Pose(62,12);
     private final Pose SCANNING_POSE = new Pose(59,85);
     private final Pose END_POSE = new Pose(44,30);
     private final int COLLECTION_DISTANCE = 32;
@@ -86,18 +90,18 @@ public class BluePatternAutoOpUpper extends OpMode {
         toScorePath = new Path(
                 new BezierLine(
                         SCANNING_POSE,
-                        SCORING_POSE
+                        BOT_SCORING_POSE
                 )
         );
-        toScorePath.setLinearHeadingInterpolation(SCAN_ANGLE, LAUNCH_ANGLE);
+        toScorePath.setLinearHeadingInterpolation(SCAN_ANGLE, BOT_LAUNCH_ANGLE);
 
         toScanPath = new Path(
                 new BezierLine(
-                        START_POSE,
+                        TOP_START_POSE,
                         SCANNING_POSE
                 )
         );
-        toScanPath.setLinearHeadingInterpolation(START_ANGLE, SCAN_ANGLE);
+        toScanPath.setLinearHeadingInterpolation(TOP_START_ANGLE, SCAN_ANGLE);
 
     }
 
@@ -140,11 +144,11 @@ public class BluePatternAutoOpUpper extends OpMode {
                     case 21: //TOP ARTIFACT PATTERN
                         toArtifactPath = new Path(
                                 new BezierLine(
-                                        SCORING_POSE,
+                                        BOT_SCORING_POSE,
                                         TOP_ARTI_POSE
                                 )
                         );
-                        toArtifactPath.setLinearHeadingInterpolation(LAUNCH_ANGLE, COLLECTION_ANGLE);
+                        toArtifactPath.setLinearHeadingInterpolation(BOT_LAUNCH_ANGLE, COLLECTION_ANGLE);
 
                         collectBallsPath = new Path(
                                 new BezierLine(
@@ -159,11 +163,11 @@ public class BluePatternAutoOpUpper extends OpMode {
                     case 22: //MIDDLE ARTIFACT PATTERN
                         toArtifactPath = new Path(
                                 new BezierLine(
-                                        SCORING_POSE,
+                                        BOT_SCORING_POSE,
                                         MID_ARTI_POSE
                                 )
                         );
-                        toArtifactPath.setLinearHeadingInterpolation(LAUNCH_ANGLE,COLLECTION_ANGLE);
+                        toArtifactPath.setLinearHeadingInterpolation(BOT_LAUNCH_ANGLE,COLLECTION_ANGLE);
 
                         collectBallsPath = new Path(
                                 new BezierLine(
@@ -178,11 +182,11 @@ public class BluePatternAutoOpUpper extends OpMode {
                     case 23: //BOTTOM ARTIFACT PATTERN
                         toArtifactPath = new Path(
                                 new BezierLine(
-                                        SCORING_POSE,
+                                        BOT_SCORING_POSE,
                                         BOT_ARTI_POSE
                                         )
                         );
-                        toArtifactPath.setLinearHeadingInterpolation(LAUNCH_ANGLE,COLLECTION_ANGLE);
+                        toArtifactPath.setLinearHeadingInterpolation(BOT_LAUNCH_ANGLE,COLLECTION_ANGLE);
 
                         collectBallsPath = new Path(
                                 new BezierLine(
@@ -342,7 +346,7 @@ public class BluePatternAutoOpUpper extends OpMode {
         this.launcher = new LauncherTwo(motorIN, motorTFER, motorOUT);
 
         this.follower = Constants.createFollower(hardwareMap);
-        this.follower.setStartingPose(START_POSE);
+        this.follower.setStartingPose(TOP_START_POSE);
         buildPaths();
         this.camera = new CameraSetup(hardwareMap);
         this.gear = new Gear(hardwareMap,camera, motorIN, motorTFER, motorOUT);
