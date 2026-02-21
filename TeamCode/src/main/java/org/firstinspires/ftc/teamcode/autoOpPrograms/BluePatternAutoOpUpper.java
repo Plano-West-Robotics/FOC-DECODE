@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import org.firstinspires.ftc.teamcode.hardware.Motor;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.CameraSetup;
+import org.firstinspires.ftc.teamcode.subsystems.Gear;
 import org.firstinspires.ftc.teamcode.subsystems.LauncherTwo;
 
 @Autonomous(name = "Red AutoOp with Top Start", group = "Autonomous")
@@ -64,6 +65,8 @@ public class BluePatternAutoOpUpper extends OpMode {
     //Pedro Pathing Instance Variables
     private Follower follower;
     private CameraSetup camera;
+
+    private Gear gear;
     private Timer pathTimer, actionTimer, opmodeTimer;
     public boolean preloaded;
     private BasicStates pathState;
@@ -342,6 +345,9 @@ public class BluePatternAutoOpUpper extends OpMode {
         this.follower.setStartingPose(START_POSE);
         buildPaths();
         this.camera = new CameraSetup(hardwareMap);
+        this.gear = new Gear(hardwareMap,camera, motorIN, motorTFER, motorOUT);
+        camera.setAlliance(false);
+        gear.setAlliance(false);
     }
 
     @Override

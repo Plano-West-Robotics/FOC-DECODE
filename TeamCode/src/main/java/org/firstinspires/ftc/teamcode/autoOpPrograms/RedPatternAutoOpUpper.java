@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import org.firstinspires.ftc.teamcode.hardware.Motor;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.CameraSetup;
+import org.firstinspires.ftc.teamcode.subsystems.Gear;
 import org.firstinspires.ftc.teamcode.subsystems.LauncherTwo;
 
 import java.util.Scanner;
@@ -66,6 +67,7 @@ public class RedPatternAutoOpUpper extends OpMode {
     //Pedro Pathing Instance Variables
     private Follower follower;
     private CameraSetup camera;
+    private Gear gear;
     private Timer pathTimer, actionTimer, opmodeTimer;
     public boolean preloaded;
     private BasicStates pathState;
@@ -344,6 +346,9 @@ public class RedPatternAutoOpUpper extends OpMode {
         this.follower.setStartingPose(START_POSE);
         buildPaths();
         this.camera = new CameraSetup(hardwareMap);
+        this.gear = new Gear(hardwareMap,camera, motorIN, motorTFER, motorOUT);
+        camera.setAlliance(false);
+        gear.setAlliance(false);
     }
 
     @Override
