@@ -8,6 +8,19 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.teamcode.subsystems.CameraSetup;
 
 public class Gear {
+
+    //CONSTANTS
+    private static final double GRAV = 9.8;
+    private static final double GOAL_HEIGHT = 15;
+    private static final double ROBOT_HEIGHT = 0;
+    private static final double MAX_VELOCITY = 20;
+    private static final double MAX_ANGLE = 60;
+    private static final double TRUE_MAX_ANGLE = 180;
+    private static final double MAX_MOTOR_RATIO = 1;
+    private static final double RADIUS = 2;
+
+
+    //VARIABLES
     private CameraSetup camera;
      Servo gearServo;
      Motor intakeMotor;
@@ -31,6 +44,7 @@ public class Gear {
     private double minPos = 0.25;
     private double maxPos = 0.75;
 
+    private double angleServoPos;
 
 
     private int switchDir = 1;
@@ -40,6 +54,7 @@ public class Gear {
 
     public Gear(HardwareMap hw, CameraSetup cam, Motor input, Motor tran, Motor output) {
         gearServo = hw.get(Servo.class, "camServo");
+        angleServo = hw.get(Servo.class, "angleServo");
         camera = cam;
         gearServo.setPosition(servoPos);
         intakeMotor = input;
@@ -60,7 +75,7 @@ public class Gear {
         isTrack = false;
     }
 
-    public void setTarget(int tagID){
+    public void setTarget(int tagID) {
         targetTagID = tagID;
     }
 
@@ -104,8 +119,8 @@ public class Gear {
     public void lock(AprilTagDetection tag){
         dist = tag.ftcPose.range;
         if(dist < 10){
-            outPower = (15 * Math.PI) * ((19.6 * Math.pow(dist, 2))/((Math.sqrt(3) * dist) - 15.75));
-            servoPos = 0.6;
+            outPower = (MAX_ANGLE / ( 2 * Math.PI * RADIUS)) * ((2 * GRAV * Math.pow(dist, 2))/((Math.tan(MAX_ANGLE) * dist) - (GOAL_HEIGHT-ROBOT_HEIGHT)));
+            angleServoPos = MAX_ANGLE / TRUE_MAX_ANGLE;
         }
         else{
             angleChange();
@@ -113,19 +128,19 @@ public class Gear {
     }
 
     public void angleChange(){
-        double velSquared = Math.pow(20, 2); //replace 20
+        double velSquared = Math.pow(MAX_VELOCITY, 2); //replace 20
         double distSquared = Math.pow(dist, 2);
 
-        double root = 15.75 + ((9.8 * distSquared) / (2 * velSquared));
-        root *= ((2 * 9.8 * distSquared) / velSquared);
+        double root = (GOAL_HEIGHT-ROBOT_HEIGHT) + ((GRAV * distSquared) / (2 * velSquared));
+        root *= ((2 * GRAV * distSquared) / velSquared);
         root = Math.sqrt(distSquared - root);
 
         double angle = velSquared * (dist + root);
-        angle /= (9.8 * distSquared);
+        angle /= (GRAV * distSquared);
         angle = Math.atan(angle);
 
-        servoPos = angle;
-        outPower = 1;
+        angleServoPos = angle;
+        outPower = MAX_MOTOR_RATIO;
 
     }
 
@@ -134,9 +149,11 @@ public class Gear {
 
     public void setAlliance(boolean isRed){ //in init();
         if(isRed){
+            setTarget(24);
             switchDir = 1;
         }
         else{
+            setTarget(20);
             switchDir = -1;
         }
     }

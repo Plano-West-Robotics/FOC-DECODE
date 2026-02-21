@@ -349,8 +349,8 @@ public class RedPatternAutoOpUpper extends OpMode {
         buildPaths();
         this.camera = new CameraSetup(hardwareMap);
         this.gear = new Gear(hardwareMap,camera, motorIN, motorTFER, motorOUT);
-        camera.setAlliance(false);
-        gear.setAlliance(false);
+        camera.setAlliance(true);
+        gear.setAlliance(true);
     }
 
     @Override

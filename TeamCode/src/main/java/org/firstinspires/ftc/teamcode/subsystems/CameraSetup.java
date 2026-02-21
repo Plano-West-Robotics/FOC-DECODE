@@ -110,19 +110,24 @@ public class CameraSetup {
         return tagID == TAG_BLUE || tagID == TAG_RED;
     }
 
-    public AprilTagDetection getGoalTag(){
+    public AprilTagDetection getGoalTag()
+    {
         if(!hasGoalTagSet()){
             return null;
         }
+
         List<AprilTagDetection> detections = atp.getDetections();
+
         if(detections == null || detections.isEmpty()){
             return null;
         }
+
         for (AprilTagDetection d: detections){
            if(d.id == tagID){
                return d;
            }
         }
+
         return null;
     }
 
