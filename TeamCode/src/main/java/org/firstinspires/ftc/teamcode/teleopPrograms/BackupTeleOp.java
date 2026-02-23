@@ -1,21 +1,16 @@
-package org.firstinspires.ftc.teamcode.tune;
+package org.firstinspires.ftc.teamcode.teleopPrograms;
 
-import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.Gamepad;
-import com.qualcomm.robotcore.hardware.Servo;
-import org.firstinspires.ftc.teamcode.hardware.Motor;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import org.firstinspires.ftc.teamcode.tuningSubsystems.Gamepads;
-import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+import org.firstinspires.ftc.teamcode.hardware.Motor;
 import org.firstinspires.ftc.teamcode.subsystems.CameraSetup;
 import org.firstinspires.ftc.teamcode.subsystems.Gear;
 
-@TeleOp(name = "GearTester", group = "TeleOp")
-public class GearTest extends OpMode {
+@TeleOp(name = "BackupTeleOp", group = "TeleOp")
+public class BackupTeleOp extends OpMode {
 
     enum State
     {
@@ -24,6 +19,8 @@ public class GearTest extends OpMode {
 
     public static final double IN_POW = 1;
     public static final double TRAN_POW = 1;
+
+    public static final double OUT_POW = 1;
 
     Gamepad gp1;
     Gamepad gp2;
@@ -41,8 +38,8 @@ public class GearTest extends OpMode {
     Motor bl;
     Motor br;
 
-    Gear gear;
-    CameraSetup camera;
+    //Gear gear;
+    //CameraSetup camera;
     State state;
 
     @Override
@@ -57,28 +54,28 @@ public class GearTest extends OpMode {
         tran = new Motor(hardwareMap, "t");
         tranServo = hardwareMap.get(CRServo.class, "tServo");
         output = new Motor(hardwareMap, "o");
-        camera = new CameraSetup(hardwareMap);
+        //camera = new CameraSetup(hardwareMap);
 
         gp1 = new Gamepad();
         prevgp1 = new Gamepad();
         gp2 = new Gamepad();
         prevgp2 = new Gamepad();
 
-        gear = new Gear(hardwareMap, camera, input, tran, output);
-        gear.setAlliance(true);
+        //gear = new Gear(hardwareMap, camera, input, tran, output);
+        //gear.setAlliance(true);
     }
 
     @Override
     public void start()
     {
-        gear.startTrack();
+        //gear.startTrack();
     }
 
     @Override
     public void loop() {
 
-        camera.update();
-        gear.update();
+        //camera.update();
+        //gear.update();
 
         prevgp1.copy(gp1);
         gp1.copy(gamepad1);
@@ -100,17 +97,23 @@ public class GearTest extends OpMode {
         if (gp2.b && !prevgp2.b)
             input.setPower(0);
 
-        if (gp2.x && prevgp2.x)
+        if (gp2.x && !prevgp2.x)
         {
             tran.setPower(TRAN_POW);
             tranServo.setPower(TRAN_POW);
         }
 
-        if (gp2.y && prevgp2.y)
+        if (gp2.y && !prevgp2.y)
         {
             tran.setPower(0);
             tranServo.setPower(0);
         }
+
+        if (gp2.left_bumper && !prevgp2.left_bumper)
+            output.setPower(OUT_POW);
+
+        if (gp2.right_bumper && !prevgp2.right_bumper)
+            output.setPower(0);
 
 
         fl.setPower(-gamepad1.right_stick_y);

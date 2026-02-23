@@ -27,7 +27,7 @@ public class Gear {
      Motor transferMotor;
      Motor outtakeMotor;
      Servo angleServo;
-    private double servoPos = 0.5;
+    private double servoPos;
     private boolean isTrack = false;
 
     private int targetTagID;
@@ -47,7 +47,7 @@ public class Gear {
     private double angleServoPos;
 
 
-    private int switchDir = 1;
+    private int switchDir;
 
     private Timer launchTimer;
 
@@ -64,6 +64,9 @@ public class Gear {
         inPower = 0;
         tranPower = 0;
         outPower = 0;
+
+        switchDir = 1;
+        servoPos = 0.5;
 
         launchTimer = new Timer();
     }
@@ -83,9 +86,11 @@ public class Gear {
         if(!isTrack){
             return;
         }
+
         AprilTagDetection tag = camera.getGoalTag();
+
         if(tag == null){
-            servoPos += switchDir * 0.002;
+            servoPos += switchDir * 0.002; //MOVE GEAR BY 1 TICK.
             if(servoPos < minPos){
                 servoPos = minPos;
             }
@@ -110,15 +115,14 @@ public class Gear {
         gearServo.setPosition(servoPos);
         if(Math.abs(yaw) < 1.5){
             lock(tag);
-
         }
-
 
     }
 
     public void lock(AprilTagDetection tag){
         dist = tag.ftcPose.range;
-        if(dist < 10){
+        if(dist > -1) //SET TO -1 SO THAT IT ONLY EVER CHANGES VELOCITY
+        {
             outPower = (MAX_ANGLE / ( 2 * Math.PI * RADIUS)) * ((2 * GRAV * Math.pow(dist, 2))/((Math.tan(MAX_ANGLE) * dist) - (GOAL_HEIGHT-ROBOT_HEIGHT)));
             angleServoPos = MAX_ANGLE / TRUE_MAX_ANGLE;
         }
@@ -127,6 +131,13 @@ public class Gear {
         }
     }
 
+    public void velocityChange()
+    {
+        outPower = (MAX_ANGLE / ( 2 * Math.PI * RADIUS));
+        outPower *= (2 * GRAV * Math.pow(dist, 2));
+        outPower /= (Math.tan(MAX_ANGLE) * dist) - (GOAL_HEIGHT-ROBOT_HEIGHT);
+        angleServoPos = MAX_ANGLE / TRUE_MAX_ANGLE;
+    }
     public void angleChange(){
         double velSquared = Math.pow(MAX_VELOCITY, 2); //replace 20
         double distSquared = Math.pow(dist, 2);

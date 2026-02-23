@@ -3,15 +3,16 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.teamcode.hardware.Motor;
+import org.firstinspires.ftc.teamcode.hardware.Servo;
+
 import com.qualcomm.robotcore.hardware.CRServo;
 
 /**
  * Launcher controls the ball-launching mechanisms for the robot
  * Mechanisms Include:
  * Flywheels that launch the balls
- * Flaps that move the balls into the flywheels
- *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *
- * Should work in both Auto and Tele OpModes
+ * Also controls the turret angle adjuster.
+ * UPDATED 2/23/2026
  */
 public class Launcher {
 
@@ -20,99 +21,22 @@ public class Launcher {
     public static final double FLAP_CLOSED_POS = 1;
     public static final double FLAP_OPEN_POS = 0;
 
-    public static double SPIN = 0.75;
-
     //HARDWARE
-    CRServo servoOUT;
+
+    CameraSetup camera;
     Motor motorOUT;
+    Servo servoAngle;
 
     //CONTROL VARIABLES
-    boolean flywheelsOn;
-    boolean servoOn;
-    boolean isFiring;
 
-    public Launcher(CRServo servo, Motor flywheels)
+    public Launcher(CameraSetup camera, Motor flywheels, Servo servo)
     {
-        this.servoOUT = servo;
+        this.servoAngle = servo;
         this.motorOUT = flywheels;
-
-
-        //servoFlap.setDirection(CRServo.Direction.REVERSE); //Activate on team consideration
-        motorOUT.setDirection(DcMotorSimple.Direction.REVERSE); //Switched direction
-    }
-
-    /**
-     * toggles the flap servo to either scoop the ball or reopen the ramp
-     * also updates boolean variable controlling flywheels
-     *
-     * UPDATE: Checks the CRServo to scoop the ball up and can pause for human error
-     */
-    public void rotateFlap()
-    {
-        //if (servoFlap.getPosition() == FLAP_CLOSED_POS)
-            //servoFlap.setPosition(FLAP_OPEN_POS);
-        //else
-            //servoFlap.setPosition(FLAP_CLOSED_POS);
-
-        servoOn = !servoOn;
-        double power;
-
-        if (servoOn){
-            power = SPIN;
-        }
-        else{
-            power = 0;
-        }
-
-        servoOUT.setPower(power);
-
+        this.camera = camera;
 
     }
 
-    /**
-     * toggles whether or not the flywheels are on
-     * also updates boolean variable controlling flywheels
-     */
-    public void changeFlywheelState()
-    {
-        flywheelsOn = !flywheelsOn;
-        double power;
-
-        if (flywheelsOn)
-            power = MAX_FLYWHEEL_POWER;
-        else
-            power = 0;
-        motorOUT.setPower(power);
-    }
-
-    /**
-     * Automatically fires a ball out of the launcher
-     * PREREQS:
-     * FLYWHEEL MOTOR IS OFF
-     * FLAP IS IN THE CLOSED POSITION
-     */
-    /*public void fire()
-    {
-
-        changeFlywheelState();
-        changeFlapState();
-
-        while (servoFlap.getPosition() != FLAP_OPEN_POS)
-        {
-
-        }
-
-        changeFlapState();
-        changeFlywheelState();
-    }*/
-
-    /**
-     * Checks if the robot is firing
-     * @return true or false
-     */
-    public boolean isFiring()
-    {
-        return motorOUT.getPower() != 0;
-    }
+    //
 
 }

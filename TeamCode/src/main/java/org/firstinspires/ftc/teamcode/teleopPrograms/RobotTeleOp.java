@@ -4,9 +4,7 @@ package org.firstinspires.ftc.teamcode.teleopPrograms;
  * Working TeleOp Control program for the FOC Robot
  * Has working Field-Centric and Robot-Centric Control mode
  * Also has controls for a vertical flywheel setup and a servo to push balls into the flywheels
- *
- * @version 1.1.2.5
- * @date 12/1/2025
+ * @date 2/23/2026
  */
 
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
@@ -17,12 +15,13 @@ import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.hardware.Motor;
+import org.firstinspires.ftc.teamcode.hardware.Servo;
 import org.firstinspires.ftc.teamcode.subsystems.Launcher;
 import org.firstinspires.ftc.teamcode.subsystems.LauncherTwo;
 import com.qualcomm.robotcore.hardware.CRServo;
 
 
-@TeleOp(name = "TeleOp v1.1.2.5", group = "TeleOp")
+@TeleOp(name = "RobotTeleOp (Feb 23)", group = "TeleOp")
 public class RobotTeleOp extends OpMode
 {
     //CONSTANTS
@@ -43,23 +42,21 @@ public class RobotTeleOp extends OpMode
 
     //Declaring Motors
     //Movement Motors
-    Motor motorFL; // CH Port 3
-    Motor motorFR; // CH Port 2
-    Motor motorBL; // CH Port 1
-    Motor motorBR; // CH Port 0
+    Motor motorFL;
+    Motor motorFR;
+    Motor motorBL;
+    Motor motorBR;
 
     //Intake / Outtake Motors Motors
-    Motor motorOUT; // EH Port 3
-    Motor motorIN; //EH Port 2
+    Motor motorOUT;
+    Motor motorIN;
+    Motor motorTFER;
 
-    Motor motorTFER; //EH Port 1
 
     //Declaring Servos
-     CRServo servoLoader; // EH Servo Port 5??
+    Servo servoTFER;
 
     //Declaring Subsystems
-    Launcher launcher;
-    LauncherTwo launcher2;
 
     //Declaring GamePads
     //Gamepad 1 controls Movement; Gamepad 2 controls something else.
@@ -73,9 +70,6 @@ public class RobotTeleOp extends OpMode
     DriveMode movementMode;
 
     //Boolean variables
-    boolean flywheelsOn;
-    boolean inoutOn;
-    boolean transferOn;
 
     @Override
     public void init() {
@@ -98,11 +92,12 @@ public class RobotTeleOp extends OpMode
         this.motorTFER = new Motor(hardwareMap,"t"); //Just added this in case
 
         //Reversing left motors.
+        //OUTDATED
+        //NEEDS RETUNING
         this.motorFL.reverse();
         this.motorBL.reverse();
 
         //CRServos
-        this.servoLoader = hardwareMap.get(CRServo.class, "servoLoader");
 
         this.imu = hardwareMap.get(IMU.class, "imu");
 
@@ -115,8 +110,7 @@ public class RobotTeleOp extends OpMode
         this.imu.resetYaw();
 
         //Subsystems
-        //this.launcher = new Launcher(servoLoader, motorOUT); //Currently no servo because L
-        this.launcher2 = new LauncherTwo(motorIN, motorTFER, motorOUT);
+        //WAIT FOR TURRET SUBSYSTEM TO BE COMPLETED
 
         this.gp1 = new Gamepad();
         this.gp2 = new Gamepad();
@@ -125,11 +119,6 @@ public class RobotTeleOp extends OpMode
 
         //Declaring starting enum states
         this.movementMode = DriveMode.FIELD_CENTRIC;
-
-        this.flywheelsOn = false;
-        this.inoutOn = false;
-        this.transferOn = false;
-
     }
 
     @Override
@@ -158,21 +147,23 @@ public class RobotTeleOp extends OpMode
         else if (gp1.b && !prevGp1.b)
             movementMode = DriveMode.ROBOT_CENTRIC;
         if (gp1.left_bumper && !prevGp1.left_bumper)
-            //launcher.changeFlywheelState();
-            launcher2.inChange();
+            System.out.print("UNIMPLEMENTED");
         if (gp1.right_bumper && !prevGp1.right_bumper)
-            //launcher.changeFlywheelState();
-            launcher2.outChange();
+            System.out.print("UNIMPLEMENTED");
 
+
+        /*
         if (gp1.y && !prevGp1.y)
         {
             launcher2.transferChange();
-            /*if (motorIN.getPower() == 1)
+            if (motorIN.getPower() == 1)
                 motorIN.setPower(0);
             else
                 motorIN.setPower(1);
-            launcher.rotateFlap();*/
+            launcher.rotateFlap();
         }
+         */
+
     //  if (gp1.y && !prevGp1.y)
     //      launcher.changeFlapState();
 
