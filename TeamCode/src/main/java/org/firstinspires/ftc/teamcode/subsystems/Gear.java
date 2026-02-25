@@ -10,23 +10,20 @@ import org.firstinspires.ftc.teamcode.subsystems.CameraSetup;
 public class Gear {
 
     //CONSTANTS
-    private static final double GRAV = 9.8;
-    private static final double GOAL_HEIGHT = 15;
-    private static final double ROBOT_HEIGHT = 0;
+
     private static final double MAX_VELOCITY = 20;
-    private static final double MAX_ANGLE = 60;
-    private static final double TRUE_MAX_ANGLE = 180;
     private static final double MAX_MOTOR_RATIO = 1;
     private static final double RADIUS = 2;
+
+    private static final double trackGain = 0.003;
+    private static final double minPos = 0.25;
+    private static final double maxPos = 0.75;
 
 
     //VARIABLES
     private CameraSetup camera;
-     Servo gearServo;
-     Motor intakeMotor;
-     Motor transferMotor;
-     Motor outtakeMotor;
-     Servo angleServo;
+    private Servo gearServo;
+
     private double servoPos;
     private boolean isTrack = false;
 
@@ -38,12 +35,6 @@ public class Gear {
     private double tranPower;
     private double outPower;
 
-
-
-    private double trackGain = 0.003;
-    private double minPos = 0.25;
-    private double maxPos = 0.75;
-
     private double angleServoPos;
 
 
@@ -52,18 +43,10 @@ public class Gear {
     private Timer launchTimer;
 
 
-    public Gear(HardwareMap hw, CameraSetup cam, Motor input, Motor tran, Motor output) {
-        gearServo = hw.get(Servo.class, "camServo");
-        angleServo = hw.get(Servo.class, "angleServo");
+    public Gear(Servo gear, CameraSetup cam) {
+        gearServo = gear;
         camera = cam;
         gearServo.setPosition(servoPos);
-        intakeMotor = input;
-        transferMotor = tran;
-        outtakeMotor = output;
-
-        inPower = 0;
-        tranPower = 0;
-        outPower = 0;
 
         switchDir = 1;
         servoPos = 0.5;
@@ -119,41 +102,9 @@ public class Gear {
 
     }
 
-    public void lock(AprilTagDetection tag){
-        dist = tag.ftcPose.range;
-        if(dist > -1) //SET TO -1 SO THAT IT ONLY EVER CHANGES VELOCITY
-        {
-            outPower = (MAX_ANGLE / ( 2 * Math.PI * RADIUS)) * ((2 * GRAV * Math.pow(dist, 2))/((Math.tan(MAX_ANGLE) * dist) - (GOAL_HEIGHT-ROBOT_HEIGHT)));
-            angleServoPos = MAX_ANGLE / TRUE_MAX_ANGLE;
-        }
-        else{
-            angleChange();
-        }
-    }
 
-    public void velocityChange()
-    {
-        outPower = (MAX_ANGLE / ( 2 * Math.PI * RADIUS));
-        outPower *= (2 * GRAV * Math.pow(dist, 2));
-        outPower /= (Math.tan(MAX_ANGLE) * dist) - (GOAL_HEIGHT-ROBOT_HEIGHT);
-        angleServoPos = MAX_ANGLE / TRUE_MAX_ANGLE;
-    }
-    public void angleChange(){
-        double velSquared = Math.pow(MAX_VELOCITY, 2); //replace 20
-        double distSquared = Math.pow(dist, 2);
 
-        double root = (GOAL_HEIGHT-ROBOT_HEIGHT) + ((GRAV * distSquared) / (2 * velSquared));
-        root *= ((2 * GRAV * distSquared) / velSquared);
-        root = Math.sqrt(distSquared - root);
 
-        double angle = velSquared * (dist + root);
-        angle /= (GRAV * distSquared);
-        angle = Math.atan(angle);
-
-        angleServoPos = angle;
-        outPower = MAX_MOTOR_RATIO;
-
-    }
 
 
 

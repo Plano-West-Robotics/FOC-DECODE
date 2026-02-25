@@ -7,17 +7,24 @@ package org.firstinspires.ftc.teamcode.teleopPrograms;
  * @date 2/23/2026
  */
 
+import android.util.Size;
+
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.IMU;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.hardware.Motor;
 import org.firstinspires.ftc.teamcode.hardware.Servo;
+import org.firstinspires.ftc.teamcode.subsystems.CameraSetup;
 import org.firstinspires.ftc.teamcode.subsystems.Launcher;
 import org.firstinspires.ftc.teamcode.subsystems.LauncherTwo;
+import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
+
 import com.qualcomm.robotcore.hardware.CRServo;
 
 
@@ -38,6 +45,7 @@ public class RobotTeleOp extends OpMode
     //INSTANCE VARIABLES
 
     //Declaring Misc Hardware
+    CameraSetup camera;
     IMU imu; //Orientation is finalized for meet
 
     //Declaring Motors
@@ -54,6 +62,8 @@ public class RobotTeleOp extends OpMode
 
 
     //Declaring Servos
+    Servo servoCAM;
+    Servo servoANGLE;
     Servo servoTFER;
 
     //Declaring Subsystems
@@ -90,6 +100,13 @@ public class RobotTeleOp extends OpMode
         this.motorOUT = new Motor(hardwareMap, "o");
         this.motorIN = new Motor(hardwareMap, "i");
         this.motorTFER = new Motor(hardwareMap,"t"); //Just added this in case
+        this.servoTFER = new Servo(hardwareMap, "");
+
+        this.servoANGLE = new Servo(hardwareMap, "angleServo");
+        this.servoCAM = new Servo(hardwareMap, "camServo");
+
+        this.camera = new CameraSetup(hardwareMap, "Webcam");
+
 
         //Reversing left motors.
         //OUTDATED

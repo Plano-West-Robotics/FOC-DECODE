@@ -15,6 +15,7 @@ public class Turret {
 
     public Turret()
     {
-        //Should implement both a gear and launcher.
+        this.gear = new Gear();
+        this.launcher = new Launcher();
     }
 }

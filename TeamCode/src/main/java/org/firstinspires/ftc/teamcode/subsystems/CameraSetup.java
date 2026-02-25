@@ -24,33 +24,44 @@ public class CameraSetup {
     public static final double CY = 2.425865530229235674e2;
 
     public static final int TAG_BLUE = 20;
-    public static int TAG_21 = 21;
-    public static int TAG_22 = 22;
-    public static int TAG_23 = 23;
+    public static final int TAG_21 = 21;
+    public static final int TAG_22 = 22;
+    public static final int TAG_23 = 23;
     public static final int TAG_RED = 24;
+
+    private final int maxLost = 5;
 
     public int tagID;
 
-    private double xOff = 0;
-    private double yOff = 0;
-    private double dist = 0;
-
+    private double xOff;
+    private double yOff;
+    private double dist;
     private double yaw; //THIS IS FOR LOCKING WHEN SCORING
 
     private boolean hasTag = false;
 
+    private int lostFrames;
 
 
-    private int lostFrames = 0;
-    private int maxLost = 5;
 
+    public CameraSetup(HardwareMap map, String camName) {
 
-    public CameraSetup(HardwareMap hardwaremap) {
+        AprilTagProcessor atp = new AprilTagProcessor.Builder()
+                .setLensIntrinsics(FX, FY, CX, CY)
+                .setDrawAxes(false)
+                .setDrawCubeProjection(false)
+                .setDrawTagOutline(false).build();
 
-        atp = new AprilTagProcessor.Builder().setLensIntrinsics(FX, FY, CX, CY).setDrawAxes(false).setDrawCubeProjection(false).setDrawTagOutline(false).build();
+        VisionPortal vis = new VisionPortal.Builder()
+                .setCamera(map.get(WebcamName.class, camName))
+                .setCameraResolution(new Size(640, 480))
+                .addProcessor(atp).build();
 
-        visPort = new VisionPortal.Builder().setCamera(hardwaremap.get(WebcamName.class, "Webcam")).setCameraResolution(new Size(640, 480)).addProcessor(atp).build();
+        xOff = 0;
+        yOff = 0;
+        dist = 0;
 
+        lostFrames = 0;
     }
 
     public void update() {
